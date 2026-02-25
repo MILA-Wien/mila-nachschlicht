@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name">MILA Restock</string>
+
+    <!-- Navigation -->
+    <string name="nav_capture">Capture</string>
+    <string name="nav_retrieve">Retrieve</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Capture Screen -->
+    <string name="capture_title">Capture restock items</string>
+    <string name="capture_scan_hint">Scan article</string>
+    <string name="capture_no_shelf_selected">Please select a shelf first</string>
+    <string name="capture_no_pending_items">No pending items</string>
+    <string name="capture_delete_all">Delete all</string>
+    <string name="capture_delete_all_confirm">Delete all pending items for this shelf?</string>
+
+    <!-- Article Check Screen -->
+    <string name="article_check_title">Check article</string>
+    <string name="article_check_not_found">Article not found. Please sync.</string>
+    <string name="article_check_mark_restock">Mark for restock</string>
+    <string name="article_check_skip">Skip</string>
+    <string name="article_check_quantity">Quantity</string>
+    <string name="article_check_stock">Stock</string>
+    <string name="article_check_zero_stock_warning">Warning: No stock available!</string>
+    <string name="article_check_tap_to_photo">Tap to take photo</string>
+
+    <!-- Retrieve Screen -->
+    <string name="retrieve_title">Retrieve items</string>
+    <string name="retrieve_no_groups">No product groups available</string>
+    <string name="retrieve_items_pending">%d pending</string>
+
+    <!-- Retrieve Item List Screen -->
+    <string name="retrieve_items_title">Retrieve items</string>
+    <string name="retrieve_scan_hint">Scan article to mark done</string>
+    <string name="retrieve_mark_done">Mark done</string>
+    <string name="retrieve_no_pending">All items done!</string>
+    <string name="retrieve_scan_result_title">Scanned article</string>
+    <string name="retrieve_item_not_in_list">Article not in list</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_api_url">API URL</string>
+    <string name="settings_api_url_hint">https://example.com/api</string>
+    <string name="settings_sync">Sync</string>
+    <string name="settings_sync_now">Sync now</string>
+    <string name="settings_last_sync">Last sync: %s</string>
+    <string name="settings_never_synced">Never synced</string>
+    <string name="settings_syncing">Syncing…</string>
+    <string name="settings_shelves">Shelves</string>
+    <string name="settings_add_shelf">Add shelf</string>
+    <string name="settings_storage_zones">Storage zones</string>
+    <string name="settings_add_zone">Add storage zone</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_danger_zone">Danger zone</string>
+    <string name="settings_reset_pending">Reset all pending items</string>
+    <string name="settings_reset_pending_confirm">Really delete all pending items? This cannot be undone.</string>
+
+    <!-- Shelf Edit Screen -->
+    <string name="shelf_edit_title_new">New shelf</string>
+    <string name="shelf_edit_title_edit">Edit shelf</string>
+    <string name="shelf_edit_id">Shelf ID (e.g. A1)</string>
+    <string name="shelf_edit_name">Name</string>
+    <string name="shelf_edit_zone">Storage zone</string>
+    <string name="shelf_edit_save">Save</string>
+    <string name="shelf_edit_delete">Delete</string>
+    <string name="shelf_edit_delete_confirm">Really delete this shelf?</string>
+
+    <!-- Storage Zone Edit Screen -->
+    <string name="zone_edit_title_new">New storage zone</string>
+    <string name="zone_edit_title_edit">Edit storage zone</string>
+    <string name="zone_edit_id">Zone ID (e.g. Z1)</string>
+    <string name="zone_edit_name">Name</string>
+    <string name="zone_edit_color">Color</string>
+    <string name="zone_edit_save">Save</string>
+    <string name="zone_edit_delete">Delete</string>
+    <string name="zone_edit_delete_confirm">Really delete this storage zone?</string>
+
+    <!-- Common -->
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="error_generic">An error occurred</string>
+    <string name="loading">Loading…</string>
+    <string name="sync_indicator_syncing">Syncing…</string>
+    <string name="sync_indicator_last_sync">Last: %s</string>
+    <string name="sync_indicator_never">Never synced</string>
+</resources>

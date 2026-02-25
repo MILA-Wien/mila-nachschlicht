@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name">MILA Nachschlichten</string>
+
+    <!-- Navigation -->
+    <string name="nav_capture">Erfassen</string>
+    <string name="nav_retrieve">Holen</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Capture Screen -->
+    <string name="capture_title">Nachschlichten erfassen</string>
+    <string name="capture_scan_hint">Artikel scannen</string>
+    <string name="capture_no_shelf_selected">Bitte zuerst ein Regal auswählen</string>
+    <string name="capture_no_pending_items">Keine offenen Artikel</string>
+    <string name="capture_delete_all">Alle löschen</string>
+    <string name="capture_delete_all_confirm">Alle offenen Artikel für dieses Regal löschen?</string>
+
+    <!-- Article Check Screen -->
+    <string name="article_check_title">Artikel prüfen</string>
+    <string name="article_check_not_found">Artikel nicht gefunden. Bitte synchronisieren.</string>
+    <string name="article_check_mark_restock">Nachschlichten</string>
+    <string name="article_check_skip">Überspringen</string>
+    <string name="article_check_quantity">Menge</string>
+    <string name="article_check_stock">Bestand</string>
+    <string name="article_check_zero_stock_warning">Achtung: Kein Bestand vorhanden!</string>
+    <string name="article_check_tap_to_photo">Tippen für Foto</string>
+
+    <!-- Retrieve Screen -->
+    <string name="retrieve_title">Waren holen</string>
+    <string name="retrieve_no_groups">Keine Warengruppen vorhanden</string>
+    <string name="retrieve_items_pending">%d offen</string>
+
+    <!-- Retrieve Item List Screen -->
+    <string name="retrieve_items_title">Artikel holen</string>
+    <string name="retrieve_scan_hint">Artikel scannen zum Abhaken</string>
+    <string name="retrieve_mark_done">Erledigt</string>
+    <string name="retrieve_no_pending">Alle Artikel erledigt!</string>
+    <string name="retrieve_scan_result_title">Gescannter Artikel</string>
+    <string name="retrieve_item_not_in_list">Artikel nicht in der Liste</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_api_url">API-Adresse</string>
+    <string name="settings_api_url_hint">https://example.com/api</string>
+    <string name="settings_sync">Synchronisieren</string>
+    <string name="settings_sync_now">Jetzt synchronisieren</string>
+    <string name="settings_last_sync">Letzte Synchronisation: %s</string>
+    <string name="settings_never_synced">Noch nie synchronisiert</string>
+    <string name="settings_syncing">Synchronisiere…</string>
+    <string name="settings_shelves">Regale</string>
+    <string name="settings_add_shelf">Regal hinzufügen</string>
+    <string name="settings_storage_zones">Lagerzonen</string>
+    <string name="settings_add_zone">Lagerzone hinzufügen</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_danger_zone">Gefahrenzone</string>
+    <string name="settings_reset_pending">Alle offenen Artikel zurücksetzen</string>
+    <string name="settings_reset_pending_confirm">Wirklich alle offenen Artikel löschen? Dies kann nicht rückgängig gemacht werden.</string>
+
+    <!-- Shelf Edit Screen -->
+    <string name="shelf_edit_title_new">Neues Regal</string>
+    <string name="shelf_edit_title_edit">Regal bearbeiten</string>
+    <string name="shelf_edit_id">Regal-ID (z.B. A1)</string>
+    <string name="shelf_edit_name">Name</string>
+    <string name="shelf_edit_zone">Lagerzone</string>
+    <string name="shelf_edit_save">Speichern</string>
+    <string name="shelf_edit_delete">Löschen</string>
+    <string name="shelf_edit_delete_confirm">Regal wirklich löschen?</string>
+
+    <!-- Storage Zone Edit Screen -->
+    <string name="zone_edit_title_new">Neue Lagerzone</string>
+    <string name="zone_edit_title_edit">Lagerzone bearbeiten</string>
+    <string name="zone_edit_id">Zonen-ID (z.B. Z1)</string>
+    <string name="zone_edit_name">Name</string>
+    <string name="zone_edit_color">Farbe</string>
+    <string name="zone_edit_save">Speichern</string>
+    <string name="zone_edit_delete">Löschen</string>
+    <string name="zone_edit_delete_confirm">Lagerzone wirklich löschen?</string>
+
+    <!-- Common -->
+    <string name="cancel">Abbrechen</string>
+    <string name="confirm">Bestätigen</string>
+    <string name="delete">Löschen</string>
+    <string name="save">Speichern</string>
+    <string name="error_generic">Ein Fehler ist aufgetreten</string>
+    <string name="loading">Laden…</string>
+    <string name="sync_indicator_syncing">Synchronisiere…</string>
+    <string name="sync_indicator_last_sync">Zuletzt: %s</string>
+    <string name="sync_indicator_never">Nie synchronisiert</string>
+</resources>
