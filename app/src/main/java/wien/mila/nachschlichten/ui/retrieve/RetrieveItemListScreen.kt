@@ -21,12 +21,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,7 +52,7 @@ fun RetrieveItemListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(zone?.name ?: stringResource(R.string.retrieve_items_title)) },
+                title = { Text(zone?.id ?: stringResource(R.string.retrieve_items_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -69,79 +67,121 @@ fun RetrieveItemListScreen(
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Scan hint
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.retrieve_scan_hint),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (pending.isEmpty() && done.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.retrieve_no_pending),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else {
-                LazyColumn(
+            if (scanResult != null) {
+                // Inline scan result — replaces list content
+                val result = scanResult!!
+                Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    items(pending, key = { it.id }) { item ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.retrieve_scan_result_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    if (result.notInList) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = stringResource(R.string.retrieve_item_not_in_list),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                if (result.articleName != null) {
                                     Text(
-                                        text = item.articleName,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "Regal: ${item.shelfId}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                if (item.quantity != null) {
-                                    Text(
-                                        text = "×${item.quantity}",
-                                        style = MaterialTheme.typography.titleMedium
+                                        text = result.articleName,
+                                        style = MaterialTheme.typography.bodyMedium
                                     )
                                 }
                             }
                         }
-                    }
-                    if (done.isNotEmpty()) {
-                        items(done, key = { it.id }) { item ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                )
+                    } else {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                Text(
+                                    text = result.articleName ?: "",
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                                if (result.shelfId != null) {
+                                    Text(
+                                        text = "Regal: ${result.shelfId}",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                                if (result.quantity != null) {
+                                    Text(
+                                        text = "${stringResource(R.string.article_check_quantity)}: ${result.quantity}",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        }
+                        Button(
+                            onClick = {
+                                result.pendingItem?.let { viewModel.markDone(it.id) }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        ) {
+                            Text(stringResource(R.string.retrieve_mark_done))
+                        }
+                    }
+                    OutlinedButton(
+                        onClick = { viewModel.dismissScanResult() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(stringResource(R.string.retrieve_scan_hint))
+                    }
+                }
+            } else {
+                // Normal list view
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.retrieve_scan_hint),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (pending.isEmpty() && done.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.retrieve_no_pending),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(pending, key = { it.id }) { item ->
+                            Card(modifier = Modifier.fillMaxWidth()) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -149,92 +189,59 @@ fun RetrieveItemListScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = item.articleName,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        textDecoration = TextDecoration.LineThrough,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.weight(1f)
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = item.articleName,
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                        Text(
+                                            text = "Regal: ${item.shelfId}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    if (item.quantity != null) {
+                                        Text(
+                                            text = "×${item.quantity}",
+                                            style = MaterialTheme.typography.titleMedium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        if (done.isNotEmpty()) {
+                            items(done, key = { it.id }) { item ->
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                     )
-                                    Icon(
-                                        Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = item.articleName,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            textDecoration = TextDecoration.LineThrough,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-
-    // Scan result bottom sheet
-    if (scanResult != null) {
-        val result = scanResult!!
-        val sheetState = rememberModalBottomSheetState()
-        ModalBottomSheet(
-            onDismissRequest = { viewModel.dismissScanResult() },
-            sheetState = sheetState
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.retrieve_scan_result_title),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                if (result.notInList) {
-                    Text(
-                        text = stringResource(R.string.retrieve_item_not_in_list),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    if (result.articleName != null) {
-                        Text(
-                            text = result.articleName,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                } else {
-                    Text(
-                        text = result.articleName ?: "",
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    if (result.shelfId != null) {
-                        Text(
-                            text = "Regal: ${result.shelfId}",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                    if (result.quantity != null) {
-                        Text(
-                            text = "${stringResource(R.string.article_check_quantity)}: ${result.quantity}",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                    Button(
-                        onClick = {
-                            result.pendingItem?.let { viewModel.markDone(it.id) }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    ) {
-                        Text(stringResource(R.string.retrieve_mark_done))
-                    }
-                }
-                TextButton(
-                    onClick = { viewModel.dismissScanResult() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

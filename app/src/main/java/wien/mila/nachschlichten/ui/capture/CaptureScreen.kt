@@ -96,7 +96,7 @@ fun CaptureScreen(
                     FilterChip(
                         selected = shelf.id == selectedShelfId,
                         onClick = { viewModel.selectShelf(shelf.id) },
-                        label = { Text(shelf.name) }
+                        label = { Text(shelf.id) }
                     )
                 }
             }

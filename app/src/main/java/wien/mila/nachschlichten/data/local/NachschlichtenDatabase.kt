@@ -18,7 +18,7 @@ import wien.mila.nachschlichten.data.local.entity.StorageZoneEntity
         ArticleEntity::class,
         PendingItemEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class NachschlichtenDatabase : RoomDatabase() {

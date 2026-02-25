@@ -14,8 +14,8 @@ import javax.inject.Inject
 
 data class StorageZoneEditUiState(
     val id: String = "",
-    val name: String = "",
-    val color: String = "#2196F3",
+    val description: String = "",
+    val color: String = "#0066CC",
     val isNew: Boolean = true,
     val saved: Boolean = false
 )
@@ -38,7 +38,7 @@ class StorageZoneEditViewModel @Inject constructor(
                 if (zone != null) {
                     _uiState.value = StorageZoneEditUiState(
                         id = zone.id,
-                        name = zone.name,
+                        description = zone.description,
                         color = zone.color,
                         isNew = false
                     )
@@ -51,8 +51,8 @@ class StorageZoneEditViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(id = id)
     }
 
-    fun updateName(name: String) {
-        _uiState.value = _uiState.value.copy(name = name)
+    fun updateDescription(description: String) {
+        _uiState.value = _uiState.value.copy(description = description)
     }
 
     fun updateColor(color: String) {
@@ -62,7 +62,7 @@ class StorageZoneEditViewModel @Inject constructor(
     fun save() {
         val state = _uiState.value
         viewModelScope.launch {
-            storageZoneRepository.save(StorageZone(id = state.id, name = state.name, color = state.color))
+            storageZoneRepository.save(StorageZone(id = state.id, description = state.description, color = state.color))
             _uiState.value = state.copy(saved = true)
         }
     }

@@ -9,14 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,16 +30,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.ui.common.QuantityStepper
 import wien.mila.nachschlichten.ui.common.StockBar
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +87,50 @@ fun ArticleCheckScreen(
                     )
                 }
             }
+            uiState.article?.totalStock == 0 -> {
+                // Zero stock — cannot restock
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    val article = uiState.article!!
+                    Text(
+                        text = article.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        text = "EAN: ${article.ean}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    StockBar(totalStock = 0)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.article_check_zero_stock_warning),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(stringResource(R.string.article_check_skip))
+                    }
+                }
+            }
             else -> {
                 val article = uiState.article!!
                 Column(
@@ -101,41 +141,6 @@ fun ArticleCheckScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Article image
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                    ) {
-                        if (article.imagePath != null) {
-                            AsyncImage(
-                                model = File(article.imagePath),
-                                contentDescription = article.name,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        Icons.Default.CameraAlt,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(48.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.article_check_tap_to_photo),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
-                    }
-
                     // Article info
                     Text(
                         text = article.name,
@@ -150,11 +155,18 @@ fun ArticleCheckScreen(
                     // Stock bar
                     StockBar(totalStock = article.totalStock)
 
-                    if (article.totalStock == 0) {
+                    // Hint box
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
                         Text(
-                            text = stringResource(R.string.article_check_zero_stock_warning),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
+                            text = stringResource(R.string.article_check_count_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
 
@@ -193,7 +205,11 @@ fun ArticleCheckScreen(
                                 .weight(1f)
                                 .height(56.dp)
                         ) {
-                            Text(stringResource(R.string.article_check_mark_restock))
+                            val qty = uiState.quantity
+                            Text(
+                                if (qty == null) stringResource(R.string.article_check_mark_restock)
+                                else stringResource(R.string.article_check_mark_restock_qty, qty)
+                            )
                         }
                     }
                 }

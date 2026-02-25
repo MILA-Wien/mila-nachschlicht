@@ -17,7 +17,7 @@ data class ArticleCheckUiState(
     val article: Article? = null,
     val isLoading: Boolean = true,
     val notFound: Boolean = false,
-    val quantity: Int = 1,
+    val quantity: Int? = null,
     val saved: Boolean = false
 )
 
@@ -50,14 +50,13 @@ class ArticleCheckViewModel @Inject constructor(
     }
 
     fun incrementQuantity() {
-        _uiState.value = _uiState.value.copy(quantity = _uiState.value.quantity + 1)
+        val current = _uiState.value.quantity
+        _uiState.value = _uiState.value.copy(quantity = if (current == null) 1 else current + 1)
     }
 
     fun decrementQuantity() {
-        val current = _uiState.value.quantity
-        if (current > 1) {
-            _uiState.value = _uiState.value.copy(quantity = current - 1)
-        }
+        val current = _uiState.value.quantity ?: return
+        _uiState.value = _uiState.value.copy(quantity = if (current <= 1) null else current - 1)
     }
 
     fun markForRestock() {

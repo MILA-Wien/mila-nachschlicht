@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "shelves")
 data class ShelfEntity(
     @PrimaryKey val id: String,
-    val name: String,
+    val description: String,
     val storageZoneId: String
 )

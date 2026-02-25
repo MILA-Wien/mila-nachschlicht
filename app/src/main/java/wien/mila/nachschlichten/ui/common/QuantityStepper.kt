@@ -17,11 +17,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun QuantityStepper(
-    value: Int,
+    value: Int?,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
-    modifier: Modifier = Modifier,
-    minValue: Int = 1
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -30,14 +29,14 @@ fun QuantityStepper(
     ) {
         FilledIconButton(
             onClick = onDecrement,
-            enabled = value > minValue,
+            enabled = value != null,
             modifier = Modifier.size(56.dp)
         ) {
             Icon(Icons.Default.Remove, contentDescription = "−")
         }
 
         Text(
-            text = value.toString(),
+            text = value?.toString() ?: "—",
             style = MaterialTheme.typography.headlineMedium
         )
 

@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 data class ShelfEditUiState(
     val id: String = "",
-    val name: String = "",
+    val description: String = "",
     val storageZoneId: String = "",
     val isNew: Boolean = true,
     val zones: List<StorageZone> = emptyList(),
@@ -44,7 +44,7 @@ class ShelfEditViewModel @Inject constructor(
                 if (shelf != null) {
                     _uiState.value = ShelfEditUiState(
                         id = shelf.id,
-                        name = shelf.name,
+                        description = shelf.description,
                         storageZoneId = shelf.storageZoneId,
                         isNew = false,
                         zones = zones
@@ -60,8 +60,8 @@ class ShelfEditViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(id = id)
     }
 
-    fun updateName(name: String) {
-        _uiState.value = _uiState.value.copy(name = name)
+    fun updateDescription(description: String) {
+        _uiState.value = _uiState.value.copy(description = description)
     }
 
     fun updateStorageZoneId(zoneId: String) {
@@ -71,7 +71,7 @@ class ShelfEditViewModel @Inject constructor(
     fun save() {
         val state = _uiState.value
         viewModelScope.launch {
-            shelfRepository.save(Shelf(id = state.id, name = state.name, storageZoneId = state.storageZoneId))
+            shelfRepository.save(Shelf(id = state.id, description = state.description, storageZoneId = state.storageZoneId))
             _uiState.value = state.copy(saved = true)
         }
     }

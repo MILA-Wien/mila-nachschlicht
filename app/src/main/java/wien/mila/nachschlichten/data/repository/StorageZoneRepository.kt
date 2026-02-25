@@ -19,12 +19,12 @@ class StorageZoneRepository @Inject constructor(
     suspend fun getById(id: String): StorageZone? = storageZoneDao.getById(id)?.toModel()
 
     suspend fun save(zone: StorageZone) {
-        storageZoneDao.upsert(StorageZoneEntity(id = zone.id, name = zone.name, color = zone.color))
+        storageZoneDao.upsert(StorageZoneEntity(id = zone.id, description = zone.description, color = zone.color))
     }
 
     suspend fun delete(id: String) {
         storageZoneDao.delete(id)
     }
 
-    private fun StorageZoneEntity.toModel() = StorageZone(id = id, name = name, color = color)
+    private fun StorageZoneEntity.toModel() = StorageZone(id = id, description = description, color = color)
 }

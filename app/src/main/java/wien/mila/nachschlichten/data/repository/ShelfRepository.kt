@@ -23,12 +23,12 @@ class ShelfRepository @Inject constructor(
     suspend fun getById(id: String): Shelf? = shelfDao.getById(id)?.toModel()
 
     suspend fun save(shelf: Shelf) {
-        shelfDao.upsert(ShelfEntity(id = shelf.id, name = shelf.name, storageZoneId = shelf.storageZoneId))
+        shelfDao.upsert(ShelfEntity(id = shelf.id, description = shelf.description, storageZoneId = shelf.storageZoneId))
     }
 
     suspend fun delete(id: String) {
         shelfDao.delete(id)
     }
 
-    private fun ShelfEntity.toModel() = Shelf(id = id, name = name, storageZoneId = storageZoneId)
+    private fun ShelfEntity.toModel() = Shelf(id = id, description = description, storageZoneId = storageZoneId)
 }

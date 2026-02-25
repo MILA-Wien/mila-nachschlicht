@@ -1,6 +1,7 @@
 package wien.mila.nachschlichten.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val apiUrl by viewModel.apiUrl.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
+    val password by viewModel.password.collectAsStateWithLifecycle()
     val lastSyncedAt by viewModel.lastSyncedAt.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
     val shelves by viewModel.shelves.collectAsStateWithLifecycle()
@@ -75,6 +78,23 @@ fun SettingsScreen(
             placeholder = { Text(stringResource(R.string.settings_api_url_hint)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
+        )
+
+        // API credentials
+        OutlinedTextField(
+            value = username,
+            onValueChange = viewModel::updateUsername,
+            label = { Text(stringResource(R.string.settings_api_username)) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = viewModel::updatePassword,
+            label = { Text(stringResource(R.string.settings_api_password)) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation()
         )
 
         // Sync
@@ -146,9 +166,9 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(text = zone.name, style = MaterialTheme.typography.bodyLarge)
+                        Text(text = zone.id, style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            text = zone.id,
+                            text = zone.description,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -187,9 +207,9 @@ fun SettingsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(text = shelf.name, style = MaterialTheme.typography.bodyLarge)
+                        Text(text = shelf.id, style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            text = "${shelf.id} → ${shelf.storageZoneId}",
+                            text = "${shelf.description} → ${shelf.storageZoneId}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

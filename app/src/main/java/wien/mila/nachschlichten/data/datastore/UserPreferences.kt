@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,11 +20,21 @@ class UserPreferences @Inject constructor(
     private val context: Context
 ) {
     private val apiUrlKey = stringPreferencesKey("api_url")
+    private val usernameKey = stringPreferencesKey("username")
+    private val passwordKey = stringPreferencesKey("password")
     private val lastSyncedAtKey = longPreferencesKey("last_synced_at")
     private val languageKey = stringPreferencesKey("language")
 
     val apiUrl: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[apiUrlKey] ?: ""
+    }
+
+    val username: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[usernameKey] ?: ""
+    }
+
+    val password: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[passwordKey] ?: ""
     }
 
     val lastSyncedAt: Flow<Long?> = context.dataStore.data.map { prefs ->
@@ -40,6 +51,18 @@ class UserPreferences @Inject constructor(
         }
     }
 
+    suspend fun setUsername(username: String) {
+        context.dataStore.edit { prefs ->
+            prefs[usernameKey] = username
+        }
+    }
+
+    suspend fun setPassword(password: String) {
+        context.dataStore.edit { prefs ->
+            prefs[passwordKey] = password
+        }
+    }
+
     suspend fun setLastSyncedAt(timestamp: Long) {
         context.dataStore.edit { prefs ->
             prefs[lastSyncedAtKey] = timestamp
@@ -52,11 +75,7 @@ class UserPreferences @Inject constructor(
         }
     }
 
-    suspend fun getApiUrlOnce(): String {
-        var url = ""
-        context.dataStore.edit { prefs ->
-            url = prefs[apiUrlKey] ?: ""
-        }
-        return url
-    }
+    suspend fun getApiUrlOnce(): String = context.dataStore.data.first()[apiUrlKey] ?: ""
+    suspend fun getUsernameOnce(): String = context.dataStore.data.first()[usernameKey] ?: ""
+    suspend fun getPasswordOnce(): String = context.dataStore.data.first()[passwordKey] ?: ""
 }

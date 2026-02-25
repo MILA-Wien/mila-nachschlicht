@@ -63,6 +63,12 @@ interface PendingItemDao {
     """)
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>>
 
+    @Query("SELECT COUNT(*) FROM pending_items WHERE isDone = 0")
+    fun getPendingCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM pending_items WHERE isDone = 1")
+    fun getDoneCount(): Flow<Int>
+
     @Insert
     suspend fun insert(item: PendingItemEntity): Long
 

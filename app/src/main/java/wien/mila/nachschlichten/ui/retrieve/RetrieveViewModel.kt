@@ -34,4 +34,10 @@ class RetrieveViewModel @Inject constructor(
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val totalPending: StateFlow<Int> = pendingItemRepository.getPendingCount()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    val totalDone: StateFlow<Int> = pendingItemRepository.getDoneCount()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 }

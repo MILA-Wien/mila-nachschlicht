@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.di
 
+import android.util.Base64
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(baseUrlHolder: BaseUrlHolder): OkHttpClient {
+    fun provideCredentialHolder(): CredentialHolder = CredentialHolder()
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(baseUrlHolder: BaseUrlHolder, credentialHolder: CredentialHolder): OkHttpClient {
         val baseUrlInterceptor = Interceptor { chain ->
             val currentUrl = baseUrlHolder.baseUrl
             if (currentUrl.isBlank()) {
@@ -45,12 +50,30 @@ object NetworkModule {
             }
         }
 
+        val authInterceptor = Interceptor { chain ->
+            val username = credentialHolder.username
+            val password = credentialHolder.password
+            val request = if (username.isNotBlank()) {
+                val credentials = Base64.encodeToString(
+                    "$username:$password".toByteArray(),
+                    Base64.NO_WRAP
+                )
+                chain.request().newBuilder()
+                    .header("Authorization", "Basic $credentials")
+                    .build()
+            } else {
+                chain.request()
+            }
+            chain.proceed(request)
+        }
+
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         }
 
         return OkHttpClient.Builder()
             .addInterceptor(baseUrlInterceptor)
+            .addInterceptor(authInterceptor)
             .addInterceptor(logging)
             .build()
     }
@@ -75,4 +98,11 @@ object NetworkModule {
 class BaseUrlHolder {
     @Volatile
     var baseUrl: String = ""
+}
+
+class CredentialHolder {
+    @Volatile
+    var username: String = ""
+    @Volatile
+    var password: String = ""
 }

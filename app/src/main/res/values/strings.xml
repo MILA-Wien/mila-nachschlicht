@@ -17,17 +17,20 @@
     <!-- Article Check Screen -->
     <string name="article_check_title">Artikel prüfen</string>
     <string name="article_check_not_found">Artikel nicht gefunden. Bitte synchronisieren.</string>
-    <string name="article_check_mark_restock">Nachschlichten</string>
-    <string name="article_check_skip">Überspringen</string>
+    <string name="article_check_mark_restock">Vormerken ✓</string>
+    <string name="article_check_mark_restock_qty">%d Stk vormerken ✓</string>
+    <string name="article_check_skip">← Weiter scannen</string>
     <string name="article_check_quantity">Menge</string>
     <string name="article_check_stock">Bestand</string>
-    <string name="article_check_zero_stock_warning">Achtung: Kein Bestand vorhanden!</string>
+    <string name="article_check_zero_stock_warning">Nicht nachschlichten — kein Bestand vorhanden!</string>
+    <string name="article_check_count_hint">Stück im Regal selbst zählen!</string>
     <string name="article_check_tap_to_photo">Tippen für Foto</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Waren holen</string>
     <string name="retrieve_no_groups">Keine Warengruppen vorhanden</string>
     <string name="retrieve_items_pending">%d offen</string>
+    <string name="retrieve_progress">%1$d / %2$d erledigt</string>
 
     <!-- Retrieve Item List Screen -->
     <string name="retrieve_items_title">Artikel holen</string>
@@ -41,6 +44,8 @@
     <string name="settings_title">Einstellungen</string>
     <string name="settings_api_url">API-Adresse</string>
     <string name="settings_api_url_hint">https://example.com/api</string>
+    <string name="settings_api_username">Benutzername</string>
+    <string name="settings_api_password">Passwort</string>
     <string name="settings_sync">Synchronisieren</string>
     <string name="settings_sync_now">Jetzt synchronisieren</string>
     <string name="settings_last_sync">Letzte Synchronisation: %s</string>

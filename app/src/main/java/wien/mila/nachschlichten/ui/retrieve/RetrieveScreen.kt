@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +35,10 @@ fun RetrieveScreen(
     viewModel: RetrieveViewModel = hiltViewModel()
 ) {
     val productGroups by viewModel.productGroups.collectAsStateWithLifecycle()
+    val totalPending by viewModel.totalPending.collectAsStateWithLifecycle()
+    val totalDone by viewModel.totalDone.collectAsStateWithLifecycle()
+
+    val total = totalPending + totalDone
 
     Column(
         modifier = Modifier
@@ -43,6 +49,28 @@ fun RetrieveScreen(
             text = stringResource(R.string.retrieve_title),
             style = MaterialTheme.typography.headlineSmall
         )
+
+        if (total > 0) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.retrieve_progress, totalDone, total),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            LinearProgressIndicator(
+                progress = { if (total > 0) totalDone.toFloat() / total else 0f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, bottom = 8.dp)
+            )
+        }
 
         if (productGroups.isEmpty()) {
             Box(
@@ -68,7 +96,7 @@ fun RetrieveScreen(
                 items(productGroups, key = { it.zone.id }) { group ->
                     ProductGroupCard(
                         group = group,
-                        onClick = { onNavigateToItems(group.zone.id) }
+                        onClick = { if (group.pendingCount > 0) onNavigateToItems(group.zone.id) }
                     )
                 }
             }
@@ -87,19 +115,27 @@ private fun ProductGroupCard(
         MaterialTheme.colorScheme.primaryContainer
     }
 
+    val hasItems = group.pendingCount > 0
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = zoneColor.copy(alpha = 0.15f))
+        colors = CardDefaults.cardColors(
+            containerColor = if (hasItems) zoneColor.copy(alpha = 0.15f)
+                             else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        ),
+        enabled = hasItems
     ) {
         Box(modifier = Modifier.padding(16.dp)) {
             Column {
                 Text(
-                    text = group.zone.name,
-                    style = MaterialTheme.typography.titleMedium
+                    text = group.zone.id,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (hasItems) MaterialTheme.colorScheme.onSurface
+                            else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = group.shelves.joinToString(", ") { it.name },
+                    text = group.shelves.joinToString(", ") { it.id },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

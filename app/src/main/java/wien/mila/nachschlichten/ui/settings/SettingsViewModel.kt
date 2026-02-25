@@ -36,6 +36,12 @@ class SettingsViewModel @Inject constructor(
     val apiUrl: StateFlow<String> = userPreferences.apiUrl
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
 
+    val username: StateFlow<String> = userPreferences.username
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
+    val password: StateFlow<String> = userPreferences.password
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
+
     val lastSyncedAt: StateFlow<Long?> = userPreferences.lastSyncedAt
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
@@ -54,6 +60,18 @@ class SettingsViewModel @Inject constructor(
     fun updateApiUrl(url: String) {
         viewModelScope.launch {
             userPreferences.setApiUrl(url)
+        }
+    }
+
+    fun updateUsername(username: String) {
+        viewModelScope.launch {
+            userPreferences.setUsername(username)
+        }
+    }
+
+    fun updatePassword(password: String) {
+        viewModelScope.launch {
+            userPreferences.setPassword(password)
         }
     }
 

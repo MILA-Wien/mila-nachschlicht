@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "storage_zones")
 data class StorageZoneEntity(
     @PrimaryKey val id: String,
-    val name: String,
+    val description: String,
     val color: String
 )

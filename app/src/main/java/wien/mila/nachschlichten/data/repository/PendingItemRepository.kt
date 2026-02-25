@@ -26,6 +26,9 @@ class PendingItemRepository @Inject constructor(
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>> =
         pendingItemDao.getPendingCountByZone()
 
+    fun getPendingCount(): Flow<Int> = pendingItemDao.getPendingCount()
+    fun getDoneCount(): Flow<Int> = pendingItemDao.getDoneCount()
+
     suspend fun insert(articleId: Long, shelfId: String, quantity: Int?): Long {
         return pendingItemDao.insert(
             PendingItemEntity(

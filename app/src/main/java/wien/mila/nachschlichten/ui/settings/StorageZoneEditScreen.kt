@@ -45,10 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
 
 private val PRESET_COLORS = listOf(
-    "#F44336", "#E91E63", "#9C27B0", "#673AB7",
-    "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4",
-    "#009688", "#4CAF50", "#8BC34A", "#CDDC39",
-    "#FFC107", "#FF9800", "#FF5722", "#795548"
+    "#0066CC", "#F05A00", "#2E9F42"
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -97,8 +94,8 @@ fun StorageZoneEditScreen(
             )
 
             OutlinedTextField(
-                value = uiState.name,
-                onValueChange = viewModel::updateName,
+                value = uiState.description,
+                onValueChange = viewModel::updateDescription,
                 label = { Text(stringResource(R.string.zone_edit_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -137,7 +134,7 @@ fun StorageZoneEditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = uiState.id.isNotBlank() && uiState.name.isNotBlank() && uiState.color.isNotBlank()
+                enabled = uiState.id.isNotBlank() && uiState.description.isNotBlank() && uiState.color.isNotBlank()
             ) {
                 Text(stringResource(R.string.zone_edit_save))
             }
