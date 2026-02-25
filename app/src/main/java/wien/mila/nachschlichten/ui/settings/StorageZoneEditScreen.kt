@@ -96,7 +96,7 @@ fun StorageZoneEditScreen(
             OutlinedTextField(
                 value = uiState.description,
                 onValueChange = viewModel::updateDescription,
-                label = { Text(stringResource(R.string.zone_edit_name)) },
+                label = { Text(stringResource(R.string.zone_edit_description)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -134,7 +134,7 @@ fun StorageZoneEditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = uiState.id.isNotBlank() && uiState.description.isNotBlank() && uiState.color.isNotBlank()
+                enabled = uiState.id.isNotBlank() && uiState.color.isNotBlank()
             ) {
                 Text(stringResource(R.string.zone_edit_save))
             }

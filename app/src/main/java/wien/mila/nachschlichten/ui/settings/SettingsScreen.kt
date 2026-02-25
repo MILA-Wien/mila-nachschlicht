@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +30,11 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,32 +51,55 @@ fun SettingsScreen(
     onNavigateToZoneEdit: (zoneId: String?) -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val apiUrl by viewModel.apiUrl.collectAsStateWithLifecycle()
-    val username by viewModel.username.collectAsStateWithLifecycle()
-    val password by viewModel.password.collectAsStateWithLifecycle()
+    // Local state for text fields — avoids cursor-jump caused by async DataStore round-trip
+    var apiUrl by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        apiUrl = viewModel.loadApiUrl()
+        username = viewModel.loadUsername()
+        password = viewModel.loadPassword()
+    }
+
     val lastSyncedAt by viewModel.lastSyncedAt.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
+    val syncErrorMessage by viewModel.syncErrorMessage.collectAsStateWithLifecycle()
+    val syncErrorDetail by viewModel.syncErrorDetail.collectAsStateWithLifecycle()
+    val articleCount by viewModel.articleCount.collectAsStateWithLifecycle()
+    val articleWithEanCount by viewModel.articleWithEanCount.collectAsStateWithLifecycle()
     val shelves by viewModel.shelves.collectAsStateWithLifecycle()
     val zones by viewModel.zones.collectAsStateWithLifecycle()
     val language by viewModel.language.collectAsStateWithLifecycle()
     var showResetDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.settings_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Heading row — surface background
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.settings_title),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+        // Rest of content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
 
         // API URL
         OutlinedTextField(
             value = apiUrl,
-            onValueChange = viewModel::updateApiUrl,
+            onValueChange = { apiUrl = it; viewModel.updateApiUrl(it) },
             label = { Text(stringResource(R.string.settings_api_url)) },
             placeholder = { Text(stringResource(R.string.settings_api_url_hint)) },
             modifier = Modifier.fillMaxWidth(),
@@ -83,14 +109,14 @@ fun SettingsScreen(
         // API credentials
         OutlinedTextField(
             value = username,
-            onValueChange = viewModel::updateUsername,
+            onValueChange = { username = it; viewModel.updateUsername(it) },
             label = { Text(stringResource(R.string.settings_api_username)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
         OutlinedTextField(
             value = password,
-            onValueChange = viewModel::updatePassword,
+            onValueChange = { password = it; viewModel.updatePassword(it) },
             label = { Text(stringResource(R.string.settings_api_password)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -103,7 +129,7 @@ fun SettingsScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SyncIndicator(isSyncing = isSyncing, lastSyncedAt = lastSyncedAt)
+            SyncIndicator(isSyncing = isSyncing, lastSyncedAt = lastSyncedAt, syncErrorMessage = syncErrorMessage, syncErrorDetail = syncErrorDetail)
             Button(
                 onClick = viewModel::triggerSync,
                 enabled = !isSyncing && apiUrl.isNotBlank()
@@ -111,6 +137,12 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_sync_now))
             }
         }
+
+        Text(
+            text = stringResource(R.string.settings_article_count, articleCount, articleWithEanCount),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         HorizontalDivider()
 
@@ -237,7 +269,8 @@ fun SettingsScreen(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-    }
+        } // inner Column
+    } // outer Column
 
     if (showResetDialog) {
         AlertDialog(

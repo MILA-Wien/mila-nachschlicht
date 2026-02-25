@@ -7,12 +7,13 @@
     <string name="nav_settings">Einstellungen</string>
 
     <!-- Capture Screen -->
-    <string name="capture_title">Nachschlichten erfassen</string>
+    <string name="capture_title">Erfassen</string>
     <string name="capture_scan_hint">Artikel scannen</string>
     <string name="capture_no_shelf_selected">Bitte zuerst ein Regal auswählen</string>
     <string name="capture_no_pending_items">Keine offenen Artikel</string>
     <string name="capture_delete_all">Alle löschen</string>
     <string name="capture_delete_all_confirm">Alle offenen Artikel für dieses Regal löschen?</string>
+    <string name="capture_unknown_ean">Unbekannte EAN: %s</string>
 
     <!-- Article Check Screen -->
     <string name="article_check_title">Artikel prüfen</string>
@@ -48,6 +49,7 @@
     <string name="settings_api_password">Passwort</string>
     <string name="settings_sync">Synchronisieren</string>
     <string name="settings_sync_now">Jetzt synchronisieren</string>
+    <string name="settings_article_count">%1$d Artikel in der Datenbank, davon %2$d mit EAN</string>
     <string name="settings_last_sync">Letzte Synchronisation: %s</string>
     <string name="settings_never_synced">Noch nie synchronisiert</string>
     <string name="settings_syncing">Synchronisiere…</string>
@@ -64,7 +66,7 @@
     <string name="shelf_edit_title_new">Neues Regal</string>
     <string name="shelf_edit_title_edit">Regal bearbeiten</string>
     <string name="shelf_edit_id">Regal-ID (z.B. A1)</string>
-    <string name="shelf_edit_name">Name</string>
+    <string name="shelf_edit_description">Beschreibung</string>
     <string name="shelf_edit_zone">Lagerzone</string>
     <string name="shelf_edit_save">Speichern</string>
     <string name="shelf_edit_delete">Löschen</string>
@@ -74,7 +76,7 @@
     <string name="zone_edit_title_new">Neue Lagerzone</string>
     <string name="zone_edit_title_edit">Lagerzone bearbeiten</string>
     <string name="zone_edit_id">Zonen-ID (z.B. Z1)</string>
-    <string name="zone_edit_name">Name</string>
+    <string name="zone_edit_description">Beschreibung</string>
     <string name="zone_edit_color">Farbe</string>
     <string name="zone_edit_save">Speichern</string>
     <string name="zone_edit_delete">Löschen</string>
@@ -90,4 +92,6 @@
     <string name="sync_indicator_syncing">Synchronisiere…</string>
     <string name="sync_indicator_last_sync">Zuletzt: %s</string>
     <string name="sync_indicator_never">Nie synchronisiert</string>
+    <string name="sync_indicator_error">Synchronisation fehlgeschlagen</string>
+    <string name="sync_error_detail_title">Fehlerdetails</string>
 </resources>

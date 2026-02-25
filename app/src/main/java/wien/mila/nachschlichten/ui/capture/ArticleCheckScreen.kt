@@ -87,7 +87,7 @@ fun ArticleCheckScreen(
                     )
                 }
             }
-            uiState.article?.totalStock == 0 -> {
+            uiState.article?.totalStock!! <= 0 -> {
                 // Zero stock — cannot restock
                 Column(
                     modifier = Modifier
@@ -106,7 +106,7 @@ fun ArticleCheckScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    StockBar(totalStock = 0)
+                    StockBar(totalStock = article.totalStock)
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(

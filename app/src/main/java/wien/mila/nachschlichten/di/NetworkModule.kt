@@ -5,7 +5,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -20,36 +19,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideBaseUrlHolder(): BaseUrlHolder = BaseUrlHolder()
-
-    @Provides
-    @Singleton
     fun provideCredentialHolder(): CredentialHolder = CredentialHolder()
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(baseUrlHolder: BaseUrlHolder, credentialHolder: CredentialHolder): OkHttpClient {
-        val baseUrlInterceptor = Interceptor { chain ->
-            val currentUrl = baseUrlHolder.baseUrl
-            if (currentUrl.isBlank()) {
-                chain.proceed(chain.request())
-            } else {
-                val originalUrl = chain.request().url
-                val newUrl = currentUrl.toHttpUrlOrNull()
-                if (newUrl != null) {
-                    val rewrittenUrl = originalUrl.newBuilder()
-                        .scheme(newUrl.scheme)
-                        .host(newUrl.host)
-                        .port(newUrl.port)
-                        .build()
-                    val newRequest = chain.request().newBuilder().url(rewrittenUrl).build()
-                    chain.proceed(newRequest)
-                } else {
-                    chain.proceed(chain.request())
-                }
-            }
-        }
-
+    fun provideOkHttpClient(credentialHolder: CredentialHolder): OkHttpClient {
         val authInterceptor = Interceptor { chain ->
             val username = credentialHolder.username
             val password = credentialHolder.password
@@ -72,7 +46,9 @@ object NetworkModule {
         }
 
         return OkHttpClient.Builder()
-            .addInterceptor(baseUrlInterceptor)
+            .connectTimeout(5, java.util.concurrent.TimeUnit.MINUTES)
+            .readTimeout(5, java.util.concurrent.TimeUnit.MINUTES)
+            .writeTimeout(5, java.util.concurrent.TimeUnit.MINUTES)
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
             .build()
@@ -93,11 +69,6 @@ object NetworkModule {
     fun provideApi(retrofit: Retrofit): NachschlichtenApi {
         return retrofit.create(NachschlichtenApi::class.java)
     }
-}
-
-class BaseUrlHolder {
-    @Volatile
-    var baseUrl: String = ""
 }
 
 class CredentialHolder {

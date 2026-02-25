@@ -86,7 +86,7 @@ fun ShelfEditScreen(
             OutlinedTextField(
                 value = uiState.description,
                 onValueChange = viewModel::updateDescription,
-                label = { Text(stringResource(R.string.shelf_edit_name)) },
+                label = { Text(stringResource(R.string.shelf_edit_description)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -130,7 +130,7 @@ fun ShelfEditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = uiState.id.isNotBlank() && uiState.description.isNotBlank() && uiState.storageZoneId.isNotBlank()
+                enabled = uiState.id.isNotBlank() && uiState.storageZoneId.isNotBlank()
             ) {
                 Text(stringResource(R.string.shelf_edit_save))
             }

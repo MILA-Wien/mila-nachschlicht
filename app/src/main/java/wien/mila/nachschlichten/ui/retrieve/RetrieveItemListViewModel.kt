@@ -21,7 +21,7 @@ data class ScanResult(
     val pendingItem: PendingItem?,
     val articleName: String?,
     val shelfId: String?,
-    val quantity: Int?,
+    val quantity: Double?,
     val notInList: Boolean = false
 )
 

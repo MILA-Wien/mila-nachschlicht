@@ -17,6 +17,12 @@ interface ArticleDao {
     @Query("SELECT * FROM articles ORDER BY name")
     fun getAll(): Flow<List<ArticleEntity>>
 
+    @Query("SELECT COUNT(*) FROM articles")
+    fun countAll(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM articles WHERE ean != ''")
+    fun countWithEan(): Flow<Int>
+
     @Upsert
     suspend fun upsertAll(articles: List<ArticleEntity>)
 }

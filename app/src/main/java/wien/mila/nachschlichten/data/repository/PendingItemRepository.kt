@@ -29,7 +29,7 @@ class PendingItemRepository @Inject constructor(
     fun getPendingCount(): Flow<Int> = pendingItemDao.getPendingCount()
     fun getDoneCount(): Flow<Int> = pendingItemDao.getDoneCount()
 
-    suspend fun insert(articleId: Long, shelfId: String, quantity: Int?): Long {
+    suspend fun insert(articleId: Long, shelfId: String, quantity: Double?): Long {
         return pendingItemDao.insert(
             PendingItemEntity(
                 articleId = articleId,

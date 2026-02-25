@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import wien.mila.nachschlichten.data.datastore.UserPreferences
+import wien.mila.nachschlichten.data.repository.ArticleRepository
 import wien.mila.nachschlichten.data.repository.PendingItemRepository
 import wien.mila.nachschlichten.data.repository.ShelfRepository
 import wien.mila.nachschlichten.data.repository.StorageZoneRepository
@@ -30,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     private val shelfRepository: ShelfRepository,
     private val storageZoneRepository: StorageZoneRepository,
     private val pendingItemRepository: PendingItemRepository,
+    private val articleRepository: ArticleRepository,
     private val workManager: WorkManager
 ) : ViewModel() {
 
@@ -48,6 +50,12 @@ class SettingsViewModel @Inject constructor(
     val language: StateFlow<String> = userPreferences.language
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "de")
 
+    val articleCount: StateFlow<Int> = articleRepository.countAll()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    val articleWithEanCount: StateFlow<Int> = articleRepository.countWithEan()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
     val shelves: StateFlow<List<Shelf>> = shelfRepository.getAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -56,6 +64,16 @@ class SettingsViewModel @Inject constructor(
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
+
+    private val _syncErrorMessage = MutableStateFlow<String?>(null)
+    val syncErrorMessage: StateFlow<String?> = _syncErrorMessage.asStateFlow()
+
+    private val _syncErrorDetail = MutableStateFlow<String?>(null)
+    val syncErrorDetail: StateFlow<String?> = _syncErrorDetail.asStateFlow()
+
+    suspend fun loadApiUrl(): String = userPreferences.getApiUrlOnce()
+    suspend fun loadUsername(): String = userPreferences.getUsernameOnce()
+    suspend fun loadPassword(): String = userPreferences.getPasswordOnce()
 
     fun updateApiUrl(url: String) {
         viewModelScope.launch {
@@ -76,6 +94,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun triggerSync() {
+        _isSyncing.value = true
+        _syncErrorMessage.value = null
+        _syncErrorDetail.value = null
         val request = OneTimeWorkRequestBuilder<SyncWorker>().build()
         workManager.enqueueUniqueWork(
             "manual_sync",
@@ -86,8 +107,17 @@ class SettingsViewModel @Inject constructor(
             workManager.getWorkInfoByIdFlow(request.id).collect { info ->
                 when (info?.state) {
                     WorkInfo.State.RUNNING -> _isSyncing.value = true
-                    WorkInfo.State.SUCCEEDED, WorkInfo.State.FAILED, WorkInfo.State.CANCELLED -> {
+                    WorkInfo.State.SUCCEEDED -> {
                         _isSyncing.value = false
+                        _syncErrorMessage.value = null
+                        _syncErrorDetail.value = null
+                    }
+                    WorkInfo.State.FAILED, WorkInfo.State.CANCELLED -> {
+                        _isSyncing.value = false
+                        _syncErrorMessage.value =
+                            info.outputData.getString(SyncWorker.KEY_ERROR) ?: "Unknown error"
+                        _syncErrorDetail.value =
+                            info.outputData.getString(SyncWorker.KEY_ERROR_DETAIL)
                     }
                     else -> {}
                 }

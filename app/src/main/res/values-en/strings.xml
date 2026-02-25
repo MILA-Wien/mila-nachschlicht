@@ -13,6 +13,7 @@
     <string name="capture_no_pending_items">No pending items</string>
     <string name="capture_delete_all">Delete all</string>
     <string name="capture_delete_all_confirm">Delete all pending items for this shelf?</string>
+    <string name="capture_unknown_ean">Unknown EAN: %s</string>
 
     <!-- Article Check Screen -->
     <string name="article_check_title">Check article</string>
@@ -43,6 +44,7 @@
     <string name="settings_api_url_hint">https://example.com/api</string>
     <string name="settings_sync">Sync</string>
     <string name="settings_sync_now">Sync now</string>
+    <string name="settings_article_count">%1$d articles in database, %2$d with EAN</string>
     <string name="settings_last_sync">Last sync: %s</string>
     <string name="settings_never_synced">Never synced</string>
     <string name="settings_syncing">Syncing…</string>
@@ -59,7 +61,7 @@
     <string name="shelf_edit_title_new">New shelf</string>
     <string name="shelf_edit_title_edit">Edit shelf</string>
     <string name="shelf_edit_id">Shelf ID (e.g. A1)</string>
-    <string name="shelf_edit_name">Name</string>
+    <string name="shelf_edit_description">Description</string>
     <string name="shelf_edit_zone">Storage zone</string>
     <string name="shelf_edit_save">Save</string>
     <string name="shelf_edit_delete">Delete</string>
@@ -69,7 +71,7 @@
     <string name="zone_edit_title_new">New storage zone</string>
     <string name="zone_edit_title_edit">Edit storage zone</string>
     <string name="zone_edit_id">Zone ID (e.g. Z1)</string>
-    <string name="zone_edit_name">Name</string>
+    <string name="zone_edit_description">Description</string>
     <string name="zone_edit_color">Color</string>
     <string name="zone_edit_save">Save</string>
     <string name="zone_edit_delete">Delete</string>
@@ -85,4 +87,6 @@
     <string name="sync_indicator_syncing">Syncing…</string>
     <string name="sync_indicator_last_sync">Last: %s</string>
     <string name="sync_indicator_never">Never synced</string>
+    <string name="sync_indicator_error">Sync failed</string>
+    <string name="sync_error_detail_title">Error details</string>
 </resources>

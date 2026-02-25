@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.retrieve
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,15 +41,27 @@ fun RetrieveScreen(
 
     val total = totalPending + totalDone
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.retrieve_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Heading row — surface background
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.retrieve_title),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+        // Rest of content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
         if (total > 0) {
             Row(
@@ -101,7 +114,8 @@ fun RetrieveScreen(
                 }
             }
         }
-    }
+        } // inner Column
+    } // outer Column
 }
 
 @Composable

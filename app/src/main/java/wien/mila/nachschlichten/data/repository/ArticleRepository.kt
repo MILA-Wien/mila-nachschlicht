@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.data.repository
 
+import retrofit2.HttpException
 import wien.mila.nachschlichten.data.local.dao.ArticleDao
 import wien.mila.nachschlichten.data.local.entity.ArticleEntity
 import wien.mila.nachschlichten.data.remote.NachschlichtenApi
@@ -12,6 +13,9 @@ class ArticleRepository @Inject constructor(
     private val articleDao: ArticleDao,
     private val api: NachschlichtenApi
 ) {
+    fun countAll() = articleDao.countAll()
+    fun countWithEan() = articleDao.countWithEan()
+
     suspend fun getByEan(ean: String): Article? {
         return articleDao.getByEan(ean)?.toModel()
     }
@@ -20,17 +24,17 @@ class ArticleRepository @Inject constructor(
         return articleDao.getById(id)?.toModel()
     }
 
-    suspend fun syncFromApi(): Result<Int> {
+    suspend fun syncFromApi(url: String): Result<Int> {
         return try {
-            val dtos = api.getArticles()
+            val dtos = api.getArticles(url)
             val now = System.currentTimeMillis()
             val entities = dtos.map { dto ->
                 val existing = articleDao.getById(dto.id)
                 ArticleEntity(
                     id = dto.id,
                     ean = dto.ean,
-                    name = dto.name,
-                    unit = dto.unit,
+                    name = dto.shortName.ifEmpty { dto.name },
+                    unit = dto.unit?: "",
                     totalStock = dto.totalStock,
                     price = dto.price,
                     lastSyncedAt = now,
@@ -39,6 +43,8 @@ class ArticleRepository @Inject constructor(
             }
             articleDao.upsertAll(entities)
             Result.success(entities.size)
+        } catch (e: HttpException) {
+            Result.failure(Exception("HTTP ${e.code()} ${e.message()} — $url", e))
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -15,7 +15,7 @@ import wien.mila.nachschlichten.R
 
 @Composable
 fun StockBar(
-    totalStock: Int,
+    totalStock: Double,
     modifier: Modifier = Modifier
 ) {
     val maxStock = 100
@@ -31,7 +31,7 @@ fun StockBar(
             progress = { progress },
             modifier = Modifier.fillMaxWidth().height(8.dp),
             color = when {
-                totalStock == 0 -> MaterialTheme.colorScheme.error
+                totalStock <= 0 -> MaterialTheme.colorScheme.error
                 totalStock < 10 -> MaterialTheme.colorScheme.tertiary
                 else -> MaterialTheme.colorScheme.primary
             }

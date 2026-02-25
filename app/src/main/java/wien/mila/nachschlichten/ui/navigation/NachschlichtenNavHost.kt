@@ -1,7 +1,10 @@
 package wien.mila.nachschlichten.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -9,7 +12,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import wien.mila.nachschlichten.ui.capture.ArticleCheckScreen
 import wien.mila.nachschlichten.ui.capture.CaptureScreen
+import wien.mila.nachschlichten.ui.capture.CaptureViewModel
+import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListScreen
+import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListViewModel
 import wien.mila.nachschlichten.ui.retrieve.RetrieveScreen
 import wien.mila.nachschlichten.ui.settings.SettingsScreen
 import wien.mila.nachschlichten.ui.settings.ShelfEditScreen
@@ -18,6 +24,7 @@ import wien.mila.nachschlichten.ui.settings.StorageZoneEditScreen
 @Composable
 fun NachschlichtenNavHost(
     navController: NavHostController,
+    barcodeInputHandler: BarcodeInputHandler,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -26,10 +33,17 @@ fun NachschlichtenNavHost(
         modifier = modifier
     ) {
         composable(AppDestination.CAPTURE.route) {
+            val viewModel: CaptureViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                barcodeInputHandler.barcodeFlow.collect { barcode ->
+                    viewModel.onBarcodeScan(barcode)
+                }
+            }
             CaptureScreen(
                 onNavigateToArticleCheck = { ean, shelfId ->
                     navController.navigate("article_check/$ean/$shelfId")
-                }
+                },
+                viewModel = viewModel
             )
         }
 
@@ -39,7 +53,15 @@ fun NachschlichtenNavHost(
                 navArgument("ean") { type = NavType.StringType },
                 navArgument("shelfId") { type = NavType.StringType }
             )
-        ) {
+        ) { backStackEntry ->
+            val shelfId = backStackEntry.arguments?.getString("shelfId") ?: ""
+            LaunchedEffect(Unit) {
+                barcodeInputHandler.barcodeFlow.collect { barcode ->
+                    navController.navigate("article_check/$barcode/$shelfId") {
+                        popUpTo("article_check/{ean}/{shelfId}") { inclusive = true }
+                    }
+                }
+            }
             ArticleCheckScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -59,12 +81,23 @@ fun NachschlichtenNavHost(
                 navArgument("zoneId") { type = NavType.StringType }
             )
         ) {
+            val viewModel: RetrieveItemListViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                barcodeInputHandler.barcodeFlow.collect { barcode ->
+                    viewModel.onBarcodeScan(barcode)
+                }
+            }
             RetrieveItemListScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                viewModel = viewModel
             )
         }
 
         composable(AppDestination.SETTINGS.route) {
+            DisposableEffect(Unit) {
+                barcodeInputHandler.isEnabled = false
+                onDispose { barcodeInputHandler.isEnabled = true }
+            }
             SettingsScreen(
                 onNavigateToShelfEdit = { shelfId ->
                     val route = if (shelfId != null) "settings/shelf_edit?shelfId=$shelfId"
@@ -89,6 +122,10 @@ fun NachschlichtenNavHost(
                 }
             )
         ) {
+            DisposableEffect(Unit) {
+                barcodeInputHandler.isEnabled = false
+                onDispose { barcodeInputHandler.isEnabled = true }
+            }
             ShelfEditScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -104,6 +141,10 @@ fun NachschlichtenNavHost(
                 }
             )
         ) {
+            DisposableEffect(Unit) {
+                barcodeInputHandler.isEnabled = false
+                onDispose { barcodeInputHandler.isEnabled = true }
+            }
             StorageZoneEditScreen(
                 onNavigateBack = { navController.popBackStack() }
             )

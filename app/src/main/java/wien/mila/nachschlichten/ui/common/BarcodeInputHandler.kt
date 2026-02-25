@@ -13,25 +13,30 @@ class BarcodeInputHandler @Inject constructor() {
     private val _barcodeFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val barcodeFlow: SharedFlow<String> = _barcodeFlow.asSharedFlow()
 
+    @Volatile
+    var isEnabled: Boolean = true
+
     private val buffer = StringBuilder()
 
     fun handleKeyEvent(event: KeyEvent): Boolean {
-        if (event.action != KeyEvent.ACTION_DOWN) return false
+        if (!isEnabled) return false
 
         return when (event.keyCode) {
             KeyEvent.KEYCODE_ENTER -> {
-                if (buffer.isNotEmpty()) {
+                if (event.action == KeyEvent.ACTION_DOWN && buffer.isNotEmpty()) {
                     val barcode = buffer.toString()
                     buffer.clear()
                     _barcodeFlow.tryEmit(barcode)
                 }
-                true
+                true // consume both DOWN and UP so ENTER never reaches the view hierarchy
             }
             else -> {
                 val char = event.unicodeChar.toChar()
                 if (char.isDigit() || char.isLetter()) {
-                    buffer.append(char)
-                    true
+                    if (event.action == KeyEvent.ACTION_DOWN) {
+                        buffer.append(char)
+                    }
+                    true // consume both DOWN and UP
                 } else {
                     false
                 }

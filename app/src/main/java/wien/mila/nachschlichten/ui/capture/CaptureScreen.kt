@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,17 +38,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
-import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
 
 @Composable
 fun CaptureScreen(
     onNavigateToArticleCheck: (ean: String, shelfId: String) -> Unit,
-    viewModel: CaptureViewModel = hiltViewModel(),
-    barcodeInputHandler: BarcodeInputHandler? = null
+    viewModel: CaptureViewModel = hiltViewModel()
 ) {
     val shelves by viewModel.shelves.collectAsStateWithLifecycle()
     val selectedShelfId by viewModel.selectedShelfId.collectAsStateWithLifecycle()
     val pendingItems by viewModel.pendingItems.collectAsStateWithLifecycle()
+    val unknownEan by viewModel.unknownEan.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Auto-select first shelf if none selected
@@ -56,27 +57,51 @@ fun CaptureScreen(
         }
     }
 
-    // Listen for barcode scans
-    if (barcodeInputHandler != null) {
-        LaunchedEffect(Unit) {
-            barcodeInputHandler.barcodeFlow.collect { barcode ->
-                val shelfId = selectedShelfId
-                if (shelfId != null) {
-                    onNavigateToArticleCheck(barcode, shelfId)
-                }
-            }
+    // Navigate when ViewModel finds a matching article
+    LaunchedEffect(Unit) {
+        viewModel.navigateToCheck.collect { (ean, shelfId) ->
+            onNavigateToArticleCheck(ean, shelfId)
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.capture_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
+    val selectedShelf = shelves.find { it.id == selectedShelfId }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Heading row — surface background
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.capture_title),
+                style = MaterialTheme.typography.headlineSmall
+            )
+            if (selectedShelf != null) {
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = selectedShelf.id,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = selectedShelf.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+
+        // Rest of content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -104,22 +129,42 @@ fun CaptureScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Scan hint
+        // Scan hint / unknown EAN feedback
         if (selectedShelfId != null) {
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
+            if (unknownEan != null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                 ) {
-                    Text(
-                        text = stringResource(R.string.capture_scan_hint),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.capture_unknown_ean, unknownEan!!),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                }
+            } else {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.capture_scan_hint),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
@@ -193,7 +238,8 @@ fun CaptureScreen(
                 }
             }
         }
-    }
+        } // inner Column
+    } // outer Column
 
     // Delete confirmation dialog
     if (showDeleteDialog) {
