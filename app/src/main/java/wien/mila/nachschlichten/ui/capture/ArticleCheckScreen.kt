@@ -125,12 +125,6 @@ fun ArticleCheckScreen(
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal=16.dp).padding(top = 16.dp, bottom = 8.dp)
                         )
-                        Text(
-                            text = stringResource(R.string.article_check_zero_stock_warning_subtext),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(horizontal=16.dp).padding(bottom = 16.dp)
-                        )
                         val composition by rememberLottieComposition(
                             LottieCompositionSpec.RawRes(R.raw.card_insert)
                         )
@@ -143,7 +137,7 @@ fun ArticleCheckScreen(
                             fontMap = fontMap,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp)
+                                .height(300.dp)
                                 .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }

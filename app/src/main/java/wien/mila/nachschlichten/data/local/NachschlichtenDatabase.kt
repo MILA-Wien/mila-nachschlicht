@@ -1,6 +1,5 @@
 package wien.mila.nachschlichten.data.local
 
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
