@@ -117,7 +117,13 @@ fun ArticleCheckScreen(
                             text = stringResource(R.string.article_check_zero_stock_warning),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(horizontal=16.dp).padding(top = 16.dp, bottom = 8.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.article_check_zero_stock_warning_subtext),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(horizontal=16.dp).padding(bottom = 16.dp)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))

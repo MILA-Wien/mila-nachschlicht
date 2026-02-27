@@ -23,13 +23,15 @@
     <string name="article_check_skip">← Weiter scannen</string>
     <string name="article_check_quantity">Menge</string>
     <string name="article_check_stock">Bestand</string>
-    <string name="article_check_zero_stock_warning">Nicht nachschlichten — kein Bestand vorhanden!</string>
+    <string name="article_check_zero_stock_warning">Nicht lagernd</string>
+    <string name="article_check_zero_stock_warning_subtext">\"Kommt bald wieder\"-Kärtchen stecken</string>
     <string name="article_check_count_hint">Stück im Regal selbst zählen!</string>
     <string name="article_check_tap_to_photo">Tippen für Foto</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Waren holen</string>
     <string name="retrieve_no_groups">Keine Warengruppen vorhanden</string>
+    <string name="retrieve_prompt">Zone auswählen</string>
     <string name="retrieve_items_pending">%d offen</string>
     <string name="retrieve_progress">%1$d / %2$d erledigt</string>
 

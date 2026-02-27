@@ -208,7 +208,9 @@ fun CaptureScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(pendingItems, key = { it.id }) { item ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

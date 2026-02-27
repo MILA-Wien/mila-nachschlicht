@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.retrieve
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -29,6 +32,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.domain.model.ProductGroup
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun RetrieveScreen(
@@ -99,6 +103,16 @@ fun RetrieveScreen(
                 )
             }
         } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.retrieve_prompt),
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.weight(1f),
@@ -109,7 +123,7 @@ fun RetrieveScreen(
                 items(productGroups, key = { it.zone.id }) { group ->
                     ProductGroupCard(
                         group = group,
-                        onClick = { if (group.pendingCount > 0) onNavigateToItems(group.zone.id) }
+                        onClick = { /*if (group.pendingCount > 0)*/ onNavigateToItems(group.zone.id) }
                     )
                 }
             }
@@ -124,7 +138,7 @@ private fun ProductGroupCard(
     onClick: () -> Unit
 ) {
     val zoneColor = try {
-        Color(android.graphics.Color.parseColor(group.zone.color))
+        Color(group.zone.color.toColorInt())
     } catch (_: Exception) {
         MaterialTheme.colorScheme.primaryContainer
     }
@@ -135,18 +149,25 @@ private fun ProductGroupCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (hasItems) zoneColor.copy(alpha = 0.15f)
-                             else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        enabled = hasItems
+        enabled = hasItems,
     ) {
+        // Top colored border strip
+        if(hasItems)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(zoneColor)
+            )
         Box(modifier = Modifier.padding(16.dp)) {
-            Column {
+            Column(modifier= Modifier.fillMaxWidth()) {
                 Text(
-                    text = group.zone.id,
+                    text = group.zone.id + " " + group.zone.description,
                     style = MaterialTheme.typography.titleMedium,
                     color = if (hasItems) MaterialTheme.colorScheme.onSurface
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                    else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = group.shelves.joinToString(", ") { it.id },
@@ -156,10 +177,11 @@ private fun ProductGroupCard(
             }
             if (group.pendingCount > 0) {
                 Badge(
-                    modifier = Modifier.align(Alignment.TopEnd)
+                    modifier = Modifier.align(Alignment.TopEnd).offset(x = 12.dp, y = (-12).dp),
+                    containerColor = MaterialTheme.colorScheme.tertiary
                 ) {
                     Text(
-                        text = stringResource(R.string.retrieve_items_pending, group.pendingCount)
+                        text = "%d".format(group.pendingCount)
                     )
                 }
             }
