@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.data.local.entity
 
+import androidx.room.AutoMigration
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -25,7 +26,7 @@ data class PendingItemEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val articleId: Long,
     val shelfId: String,
-    val quantity: Double?,
+    val quantity: Int?,
     val createdAt: Long,
     val isDone: Boolean = false
 )

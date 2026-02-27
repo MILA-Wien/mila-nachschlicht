@@ -25,9 +25,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import android.graphics.Typeface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -124,6 +130,21 @@ fun ArticleCheckScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(horizontal=16.dp).padding(bottom = 16.dp)
+                        )
+                        val composition by rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(R.raw.card_insert)
+                        )
+                        val fontMap = remember {
+                            mapOf("Roboto-Black" to Typeface.create("sans-serif-black", Typeface.NORMAL))
+                        }
+                        LottieAnimation(
+                            composition = composition,
+                            iterations = LottieConstants.IterateForever,
+                            fontMap = fontMap,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))

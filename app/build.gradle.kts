@@ -83,6 +83,9 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
+    // Lottie
+    implementation(libs.lottie.compose)
+
     // Coil
     implementation(libs.coil.compose)
 

@@ -6,7 +6,7 @@ data class PendingItem(
     val articleName: String,
     val articleEan: String,
     val shelfId: String,
-    val quantity: Double?,
+    val quantity: Int?,
     val createdAt: Long,
     val isDone: Boolean
 )
