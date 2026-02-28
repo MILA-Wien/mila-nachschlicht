@@ -25,9 +25,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import android.graphics.Typeface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -87,50 +93,6 @@ fun ArticleCheckScreen(
                     )
                 }
             }
-            uiState.article?.totalStock!! <= 0 -> {
-                // Zero stock — cannot restock
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    val article = uiState.article!!
-                    Text(
-                        text = article.name,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Text(
-                        text = "EAN: ${article.ean}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    StockBar(totalStock = article.totalStock)
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.article_check_zero_stock_warning),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    OutlinedButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    ) {
-                        Text(stringResource(R.string.article_check_skip))
-                    }
-                }
-            }
             else -> {
                 val article = uiState.article!!
                 Column(
@@ -141,75 +103,107 @@ fun ArticleCheckScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Article info
+                    // Article info — shared for all stock states
                     Text(
                         text = article.name,
                         style = MaterialTheme.typography.headlineSmall
                     )
-                    Text(
-                        text = "EAN: ${article.ean}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    // Stock bar
-                    StockBar(totalStock = article.totalStock)
-
-                    // Hint box
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(R.string.article_check_count_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Quantity stepper
-                    Text(
-                        text = stringResource(R.string.article_check_quantity),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    QuantityStepper(
-                        value = uiState.quantity,
-                        onIncrement = viewModel::incrementQuantity,
-                        onDecrement = viewModel::decrementQuantity,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Action buttons
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
+                        Text(
+                            text = "EAN: ${article.ean}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${"%.2f".format(article.price)} €",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    StockBar(totalStock = article.totalStock, unit = article.unit)
+
+                    if (article.totalStock <= 0) {
+                        // Zero stock — cannot restock
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.article_check_zero_stock_warning),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp, bottom = 8.dp)
+                            )
+                            val composition by rememberLottieComposition(
+                                LottieCompositionSpec.RawRes(R.raw.card_insert)
+                            )
+                            val fontMap = remember {
+                                mapOf("Roboto-Black" to Typeface.create("sans-serif-black", Typeface.NORMAL))
+                            }
+                            LottieAnimation(
+                                composition = composition,
+                                iterations = LottieConstants.IterateForever,
+                                fontMap = fontMap,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
                         OutlinedButton(
                             onClick = onNavigateBack,
                             modifier = Modifier
-                                .weight(1f)
+                                .fillMaxWidth()
                                 .height(56.dp)
                         ) {
                             Text(stringResource(R.string.article_check_skip))
                         }
-                        Button(
-                            onClick = viewModel::markForRestock,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(56.dp)
+                    } else {
+                        // Quantity stepper
+                        Text(
+                            text = stringResource(R.string.article_check_quantity),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        QuantityStepper(
+                            value = uiState.quantity,
+                            onIncrement = viewModel::incrementQuantity,
+                            onDecrement = viewModel::decrementQuantity,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Action buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            val qty = uiState.quantity
-                            Text(
-                                if (qty == null) stringResource(R.string.article_check_mark_restock)
-                                else stringResource(R.string.article_check_mark_restock_qty, qty)
-                            )
+                            OutlinedButton(
+                                onClick = onNavigateBack,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                            ) {
+                                Text(stringResource(R.string.article_check_skip))
+                            }
+                            Button(
+                                onClick = viewModel::markForRestock,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(56.dp)
+                            ) {
+                                val qty = uiState.quantity
+                                Text(
+                                    if (qty == null) stringResource(R.string.article_check_mark_restock)
+                                    else stringResource(R.string.article_check_mark_restock_qty, qty)
+                                )
+                            }
                         }
                     }
                 }

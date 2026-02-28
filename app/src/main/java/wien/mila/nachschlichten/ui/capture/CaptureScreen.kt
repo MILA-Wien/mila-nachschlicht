@@ -3,7 +3,6 @@ package wien.mila.nachschlichten.ui.capture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,14 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,21 +39,14 @@ import wien.mila.nachschlichten.R
 
 @Composable
 fun CaptureScreen(
+    onNavigateBack: () -> Unit,
     onNavigateToArticleCheck: (ean: String, shelfId: String) -> Unit,
     viewModel: CaptureViewModel = hiltViewModel()
 ) {
-    val shelves by viewModel.shelves.collectAsStateWithLifecycle()
-    val selectedShelfId by viewModel.selectedShelfId.collectAsStateWithLifecycle()
+    val shelf by viewModel.shelf.collectAsStateWithLifecycle()
     val pendingItems by viewModel.pendingItems.collectAsStateWithLifecycle()
     val unknownEan by viewModel.unknownEan.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf(false) }
-
-    // Auto-select first shelf if none selected
-    LaunchedEffect(shelves, selectedShelfId) {
-        if (selectedShelfId == null && shelves.isNotEmpty()) {
-            viewModel.selectShelf(shelves.first().id)
-        }
-    }
 
     // Navigate when ViewModel finds a matching article
     LaunchedEffect(Unit) {
@@ -63,8 +54,6 @@ fun CaptureScreen(
             onNavigateToArticleCheck(ean, shelfId)
         }
     }
-
-    val selectedShelf = shelves.find { it.id == selectedShelfId }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Heading row — surface background
@@ -76,19 +65,27 @@ fun CaptureScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.capture_title),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            if (selectedShelf != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.capture_title),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+            if (shelf != null) {
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = selectedShelf.id,
+                        text = shelf!!.id,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = selectedShelf.description,
+                        text = shelf!!.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -105,66 +102,40 @@ fun CaptureScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Shelf chip row
-        if (shelves.isEmpty()) {
-            Text(
-                text = stringResource(R.string.capture_no_shelf_selected),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp)
+        // Scan hint / unknown EAN feedback
+        if (unknownEan != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
             ) {
-                items(shelves) { shelf ->
-                    FilterChip(
-                        selected = shelf.id == selectedShelfId,
-                        onClick = { viewModel.selectShelf(shelf.id) },
-                        label = { Text(shelf.id) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.capture_unknown_ean, unknownEan!!),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer
                     )
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Scan hint / unknown EAN feedback
-        if (selectedShelfId != null) {
-            if (unknownEan != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+        } else {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.capture_unknown_ean, unknownEan!!),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                }
-            } else {
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.capture_scan_hint),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.capture_scan_hint),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
@@ -189,7 +160,7 @@ fun CaptureScreen(
         }
 
         // Pending items list
-        if (pendingItems.isEmpty() && selectedShelfId != null) {
+        if (pendingItems.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -208,7 +179,9 @@ fun CaptureScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(pendingItems, key = { it.id }) { item ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

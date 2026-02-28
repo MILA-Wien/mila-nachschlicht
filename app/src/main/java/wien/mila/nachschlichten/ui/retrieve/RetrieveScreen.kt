@@ -8,16 +8,20 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,6 +33,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.domain.model.ProductGroup
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun RetrieveScreen(
@@ -38,8 +43,36 @@ fun RetrieveScreen(
     val productGroups by viewModel.productGroups.collectAsStateWithLifecycle()
     val totalPending by viewModel.totalPending.collectAsStateWithLifecycle()
     val totalDone by viewModel.totalDone.collectAsStateWithLifecycle()
+    val invalidScanBarcode by viewModel.invalidScanBarcode.collectAsStateWithLifecycle()
+    val unknownZoneId by viewModel.unknownZoneId.collectAsStateWithLifecycle()
 
     val total = totalPending + totalDone
+
+    if (invalidScanBarcode != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearInvalidScan() },
+            title = { Text(stringResource(R.string.scan_wrong_context_title)) },
+            text = { Text(stringResource(R.string.scan_wrong_context)) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearInvalidScan() }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
+
+    if (unknownZoneId != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearUnknownZone() },
+            title = { Text(stringResource(R.string.scan_unknown_zone_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_zone, unknownZoneId!!)) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearUnknownZone() }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Heading row — surface background
@@ -78,7 +111,7 @@ fun RetrieveScreen(
                 )
             }
             LinearProgressIndicator(
-                progress = { if (total > 0) totalDone.toFloat() / total else 0f },
+                progress = { totalDone.toFloat() / total },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, bottom = 8.dp)
@@ -99,6 +132,16 @@ fun RetrieveScreen(
                 )
             }
         } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.retrieve_prompt),
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.weight(1f),
@@ -109,7 +152,7 @@ fun RetrieveScreen(
                 items(productGroups, key = { it.zone.id }) { group ->
                     ProductGroupCard(
                         group = group,
-                        onClick = { if (group.pendingCount > 0) onNavigateToItems(group.zone.id) }
+                        onClick = { /*if (group.pendingCount > 0)*/ onNavigateToItems(group.zone.id) }
                     )
                 }
             }
@@ -124,7 +167,7 @@ private fun ProductGroupCard(
     onClick: () -> Unit
 ) {
     val zoneColor = try {
-        Color(android.graphics.Color.parseColor(group.zone.color))
+        Color(group.zone.color.toColorInt())
     } catch (_: Exception) {
         MaterialTheme.colorScheme.primaryContainer
     }
@@ -135,18 +178,25 @@ private fun ProductGroupCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (hasItems) zoneColor.copy(alpha = 0.15f)
-                             else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        enabled = hasItems
+        enabled = hasItems,
     ) {
+        // Top colored border strip
+        if(hasItems)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(zoneColor)
+            )
         Box(modifier = Modifier.padding(16.dp)) {
-            Column {
+            Column(modifier= Modifier.fillMaxWidth()) {
                 Text(
-                    text = group.zone.id,
+                    text = group.zone.id + " " + group.zone.description,
                     style = MaterialTheme.typography.titleMedium,
                     color = if (hasItems) MaterialTheme.colorScheme.onSurface
-                            else MaterialTheme.colorScheme.onSurfaceVariant
+                    else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = group.shelves.joinToString(", ") { it.id },
@@ -156,10 +206,11 @@ private fun ProductGroupCard(
             }
             if (group.pendingCount > 0) {
                 Badge(
-                    modifier = Modifier.align(Alignment.TopEnd)
+                    modifier = Modifier.align(Alignment.TopEnd).offset(x = 12.dp, y = (-12).dp),
+                    containerColor = MaterialTheme.colorScheme.tertiary
                 ) {
                     Text(
-                        text = stringResource(R.string.retrieve_items_pending, group.pendingCount)
+                        text = "%d".format(group.pendingCount)
                     )
                 }
             }

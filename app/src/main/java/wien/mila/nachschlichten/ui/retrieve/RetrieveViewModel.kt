@@ -3,8 +3,10 @@ package wien.mila.nachschlichten.ui.retrieve
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import wien.mila.nachschlichten.data.repository.PendingItemRepository
@@ -40,4 +42,30 @@ class RetrieveViewModel @Inject constructor(
 
     val totalDone: StateFlow<Int> = pendingItemRepository.getDoneCount()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    private val _invalidScanBarcode = MutableStateFlow<String?>(null)
+    val invalidScanBarcode: StateFlow<String?> = _invalidScanBarcode.asStateFlow()
+
+    private val _unknownZoneId = MutableStateFlow<String?>(null)
+    val unknownZoneId: StateFlow<String?> = _unknownZoneId.asStateFlow()
+
+    fun onBarcodeScan(barcode: String) {
+        if (barcode.startsWith("zone:")) {
+            val zoneId = barcode.removePrefix("zone:")
+            if (!productGroups.value.any { it.zone.id == zoneId }) {
+                _unknownZoneId.value = zoneId
+            }
+            // valid zone ID: global handler navigates, nothing to do here
+        } else {
+            _invalidScanBarcode.value = barcode
+        }
+    }
+
+    fun clearInvalidScan() {
+        _invalidScanBarcode.value = null
+    }
+
+    fun clearUnknownZone() {
+        _unknownZoneId.value = null
+    }
 }

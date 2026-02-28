@@ -65,7 +65,7 @@ class ArticleCheckViewModel @Inject constructor(
             pendingItemRepository.insert(
                 articleId = article.id,
                 shelfId = shelfId,
-                quantity = _uiState.value.quantity?.toDouble()
+                quantity = _uiState.value.quantity
             )
             _uiState.value = _uiState.value.copy(saved = true)
         }

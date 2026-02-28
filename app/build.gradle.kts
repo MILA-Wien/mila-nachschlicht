@@ -67,6 +67,7 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.androidx.ui.graphics)
     ksp(libs.room.compiler)
 
     // Hilt
@@ -81,6 +82,9 @@ dependencies {
 
     // DataStore
     implementation(libs.datastore.preferences)
+
+    // Lottie
+    implementation(libs.lottie.compose)
 
     // Coil
     implementation(libs.coil.compose)

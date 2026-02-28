@@ -1,9 +1,18 @@
 package wien.mila.nachschlichten.ui.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import wien.mila.nachschlichten.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -12,11 +21,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import wien.mila.nachschlichten.ui.capture.ArticleCheckScreen
 import wien.mila.nachschlichten.ui.capture.CaptureScreen
+import wien.mila.nachschlichten.ui.capture.CaptureShelfListScreen
+import wien.mila.nachschlichten.ui.capture.CaptureShelfListViewModel
 import wien.mila.nachschlichten.ui.capture.CaptureViewModel
 import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListScreen
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListViewModel
 import wien.mila.nachschlichten.ui.retrieve.RetrieveScreen
+import wien.mila.nachschlichten.ui.retrieve.RetrieveViewModel
 import wien.mila.nachschlichten.ui.settings.SettingsScreen
 import wien.mila.nachschlichten.ui.settings.ShelfEditScreen
 import wien.mila.nachschlichten.ui.settings.StorageZoneEditScreen
@@ -27,19 +39,92 @@ fun NachschlichtenNavHost(
     barcodeInputHandler: BarcodeInputHandler,
     modifier: Modifier = Modifier
 ) {
+    val globalNavVm: GlobalNavigationViewModel = hiltViewModel()
+
+    LaunchedEffect(Unit) {
+        globalNavVm.navigateToCapture.collect { shelfId ->
+            navController.navigate("capture_items/$shelfId") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        globalNavVm.navigateToRetrieve.collect { zoneId ->
+            navController.navigate("retrieve_items/$zoneId") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+            }
+        }
+    }
+
+    var globalUnknownShelfId by remember { mutableStateOf<String?>(null) }
+    var globalUnknownZoneId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) { globalNavVm.unknownShelfId.collect { globalUnknownShelfId = it } }
+    LaunchedEffect(Unit) { globalNavVm.unknownZoneId.collect { globalUnknownZoneId = it } }
+
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
+    if (globalUnknownShelfId != null &&
+        currentRoute != AppDestination.CAPTURE.route
+    ) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.scan_unknown_shelf_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_shelf, globalUnknownShelfId!!)) },
+            confirmButton = {
+                TextButton(onClick = { }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
+    if (globalUnknownZoneId != null &&
+        currentRoute != AppDestination.RETRIEVE.route
+    ) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.scan_unknown_zone_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_zone, globalUnknownZoneId!!)) },
+            confirmButton = {
+                TextButton(onClick = { }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
+
     NavHost(
         navController = navController,
         startDestination = AppDestination.CAPTURE.route,
         modifier = modifier
     ) {
         composable(AppDestination.CAPTURE.route) {
+            val viewModel: CaptureShelfListViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                barcodeInputHandler.barcodeFlow.collect { barcode ->
+                    if (!barcode.startsWith("zone:")) viewModel.onBarcodeScan(barcode)
+                }
+            }
+            CaptureShelfListScreen(
+                onNavigateToItems = { shelfId ->
+                    navController.navigate("capture_items/$shelfId")
+                },
+                viewModel = viewModel
+            )
+        }
+
+        composable(
+            route = "capture_items/{shelfId}",
+            arguments = listOf(navArgument("shelfId") { type = NavType.StringType })
+        ) {
             val viewModel: CaptureViewModel = hiltViewModel()
             LaunchedEffect(Unit) {
                 barcodeInputHandler.barcodeFlow.collect { barcode ->
-                    viewModel.onBarcodeScan(barcode)
+                    if (!barcode.startsWith("shelf:") && !barcode.startsWith("zone:"))
+                        viewModel.onBarcodeScan(barcode)
                 }
             }
             CaptureScreen(
+                onNavigateBack = { navController.popBackStack() },
                 onNavigateToArticleCheck = { ean, shelfId ->
                     navController.navigate("article_check/$ean/$shelfId")
                 },
@@ -57,8 +142,10 @@ fun NachschlichtenNavHost(
             val shelfId = backStackEntry.arguments?.getString("shelfId") ?: ""
             LaunchedEffect(Unit) {
                 barcodeInputHandler.barcodeFlow.collect { barcode ->
-                    navController.navigate("article_check/$barcode/$shelfId") {
-                        popUpTo("article_check/{ean}/{shelfId}") { inclusive = true }
+                    if (!barcode.startsWith("shelf:") && !barcode.startsWith("zone:")) {
+                        navController.navigate("article_check/$barcode/$shelfId") {
+                            popUpTo("article_check/{ean}/{shelfId}") { inclusive = true }
+                        }
                     }
                 }
             }
@@ -68,10 +155,17 @@ fun NachschlichtenNavHost(
         }
 
         composable(AppDestination.RETRIEVE.route) {
+            val viewModel: RetrieveViewModel = hiltViewModel()
+            LaunchedEffect(Unit) {
+                barcodeInputHandler.barcodeFlow.collect { barcode ->
+                    if (!barcode.startsWith("shelf:")) viewModel.onBarcodeScan(barcode)
+                }
+            }
             RetrieveScreen(
                 onNavigateToItems = { zoneId ->
                     navController.navigate("retrieve_items/$zoneId")
-                }
+                },
+                viewModel = viewModel
             )
         }
 
@@ -84,7 +178,8 @@ fun NachschlichtenNavHost(
             val viewModel: RetrieveItemListViewModel = hiltViewModel()
             LaunchedEffect(Unit) {
                 barcodeInputHandler.barcodeFlow.collect { barcode ->
-                    viewModel.onBarcodeScan(barcode)
+                    if (!barcode.startsWith("shelf:") && !barcode.startsWith("zone:"))
+                        viewModel.onBarcodeScan(barcode)
                 }
             }
             RetrieveItemListScreen(

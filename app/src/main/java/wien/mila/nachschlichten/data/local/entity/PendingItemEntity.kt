@@ -25,7 +25,7 @@ data class PendingItemEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val articleId: Long,
     val shelfId: String,
-    val quantity: Double?,
+    val quantity: Int?,
     val createdAt: Long,
     val isDone: Boolean = false
 )

@@ -31,10 +31,10 @@ class BarcodeInputHandler @Inject constructor() {
                 true // consume both DOWN and UP so ENTER never reaches the view hierarchy
             }
             else -> {
-                val char = event.unicodeChar.toChar()
-                if (char.isDigit() || char.isLetter()) {
+                val unicodeChar = event.unicodeChar
+                if (unicodeChar != 0) {
                     if (event.action == KeyEvent.ACTION_DOWN) {
-                        buffer.append(char)
+                        buffer.append(unicodeChar.toChar())
                     }
                     true // consume both DOWN and UP
                 } else {

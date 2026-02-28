@@ -25,7 +25,7 @@ object DatabaseModule {
             context,
             NachschlichtenDatabase::class.java,
             "nachschlichten.db"
-        ).fallbackToDestructiveMigration(true).build()
+        ).addMigrations(NachschlichtenDatabase.MIGRATION_3_4).build()
     }
 
     @Provides

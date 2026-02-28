@@ -8,8 +8,10 @@
 
     <!-- Capture Screen -->
     <string name="capture_title">Capture restock items</string>
+    <string name="capture_select_shelf">Select or scan shelf</string>
+    <string name="capture_no_shelves">No shelves configured yet</string>
     <string name="capture_scan_hint">Scan article</string>
-    <string name="capture_no_shelf_selected">Please select a shelf first</string>
+    <string name="capture_no_shelf_selected">Please select or scan a shelf first</string>
     <string name="capture_no_pending_items">No pending items</string>
     <string name="capture_delete_all">Delete all</string>
     <string name="capture_delete_all_confirm">Delete all pending items for this shelf?</string>
@@ -19,16 +21,20 @@
     <string name="article_check_title">Check article</string>
     <string name="article_check_not_found">Article not found. Please sync.</string>
     <string name="article_check_mark_restock">Mark for restock</string>
+    <string name="article_check_mark_restock_qty">Mark %d for restock</string>
     <string name="article_check_skip">Skip</string>
     <string name="article_check_quantity">Quantity</string>
-    <string name="article_check_stock">Stock</string>
-    <string name="article_check_zero_stock_warning">Warning: No stock available!</string>
+    <string name="article_check_stock">Stock in storage + shop</string>
+    <string name="article_check_zero_stock_warning">Out of stock</string>
+    <string name="article_check_zero_stock_warning_subtext">Tuck \"Kommt bald wieder\" card</string>
     <string name="article_check_tap_to_photo">Tap to take photo</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Retrieve items</string>
     <string name="retrieve_no_groups">No product groups available</string>
+    <string name="retrieve_prompt">Select or scan zone</string>
     <string name="retrieve_items_pending">%d pending</string>
+    <string name="retrieve_progress">%1$d / %2$d finished</string>
 
     <!-- Retrieve Item List Screen -->
     <string name="retrieve_items_title">Retrieve items</string>
@@ -42,6 +48,8 @@
     <string name="settings_title">Settings</string>
     <string name="settings_api_url">API URL</string>
     <string name="settings_api_url_hint">https://example.com/api</string>
+    <string name="settings_api_username">Username</string>
+    <string name="settings_api_password">Password</string>
     <string name="settings_sync">Sync</string>
     <string name="settings_sync_now">Sync now</string>
     <string name="settings_article_count">%1$d articles in database, %2$d with EAN</string>
@@ -76,6 +84,14 @@
     <string name="zone_edit_save">Save</string>
     <string name="zone_edit_delete">Delete</string>
     <string name="zone_edit_delete_confirm">Really delete this storage zone?</string>
+
+    <!-- Scan context warnings -->
+    <string name="scan_wrong_context_title">Wrong barcode</string>
+    <string name="scan_wrong_context">On this screen, only scan shelf or zone barcodes (shelf: / zone:)</string>
+    <string name="scan_unknown_shelf_title">Shelf not found</string>
+    <string name="scan_unknown_shelf">Unknown shelf: %s</string>
+    <string name="scan_unknown_zone_title">Zone not found</string>
+    <string name="scan_unknown_zone">Unknown zone: %s</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
