@@ -16,14 +16,16 @@ import wien.mila.nachschlichten.R
 @Composable
 fun StockBar(
     totalStock: Double,
+    unit: String,
     modifier: Modifier = Modifier
 ) {
     val maxStock = 100
     val progress = (totalStock.toFloat() / maxStock).coerceIn(0f, 1f)
+    val stockDisplay = if (totalStock % 1.0 == 0.0) totalStock.toInt().toString() else totalStock.toString()
 
     Column(modifier = modifier) {
         Text(
-            text = "${stringResource(R.string.article_check_stock)}: $totalStock",
+            text = "${stringResource(R.string.article_check_stock)}: $stockDisplay $unit",
             style = MaterialTheme.typography.bodyLarge
         )
         Spacer(modifier = Modifier.height(4.dp))
