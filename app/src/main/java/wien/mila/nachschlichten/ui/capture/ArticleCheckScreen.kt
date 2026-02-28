@@ -165,23 +165,6 @@ fun ArticleCheckScreen(
                             Text(stringResource(R.string.article_check_skip))
                         }
                     } else {
-                        // Hint box
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Text(
-                                text = stringResource(R.string.article_check_count_hint),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
                         // Quantity stepper
                         Text(
                             text = stringResource(R.string.article_check_quantity),

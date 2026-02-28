@@ -33,6 +33,12 @@ class GlobalNavigationViewModel @Inject constructor(
     private val _navigateToRetrieve = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val navigateToRetrieve: SharedFlow<String> = _navigateToRetrieve.asSharedFlow()
 
+    private val _unknownShelfId = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val unknownShelfId: SharedFlow<String> = _unknownShelfId.asSharedFlow()
+
+    private val _unknownZoneId = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val unknownZoneId: SharedFlow<String> = _unknownZoneId.asSharedFlow()
+
     init {
         viewModelScope.launch {
             barcodeInputHandler.barcodeFlow.collect { barcode ->
@@ -41,11 +47,15 @@ class GlobalNavigationViewModel @Inject constructor(
                         val shelfId = barcode.removePrefix("shelf:")
                         if (shelves.value.any { it.id == shelfId })
                             _navigateToCapture.emit(shelfId)
+                        else
+                            _unknownShelfId.emit(shelfId)
                     }
                     barcode.startsWith("zone:") -> {
                         val zoneId = barcode.removePrefix("zone:")
                         if (zones.value.any { it.id == zoneId })
                             _navigateToRetrieve.emit(zoneId)
+                        else
+                            _unknownZoneId.emit(zoneId)
                     }
                 }
             }

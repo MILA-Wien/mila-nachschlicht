@@ -43,7 +43,7 @@ fun CaptureShelfListScreen(
         AlertDialog(
             onDismissRequest = { viewModel.clearInvalidScan() },
             title = { Text(stringResource(R.string.scan_wrong_context_title)) },
-            text = { Text(stringResource(R.string.capture_scan_wrong_context)) },
+            text = { Text(stringResource(R.string.scan_wrong_context)) },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearInvalidScan() }) {
                     Text(stringResource(R.string.confirm))

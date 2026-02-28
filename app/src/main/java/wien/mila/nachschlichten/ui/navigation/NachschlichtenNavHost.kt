@@ -1,9 +1,18 @@
 package wien.mila.nachschlichten.ui.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import wien.mila.nachschlichten.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -45,6 +54,42 @@ fun NachschlichtenNavHost(
                 popUpTo(navController.graph.startDestinationId) { inclusive = false }
             }
         }
+    }
+
+    var globalUnknownShelfId by remember { mutableStateOf<String?>(null) }
+    var globalUnknownZoneId by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) { globalNavVm.unknownShelfId.collect { globalUnknownShelfId = it } }
+    LaunchedEffect(Unit) { globalNavVm.unknownZoneId.collect { globalUnknownZoneId = it } }
+
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
+    if (globalUnknownShelfId != null &&
+        currentRoute != AppDestination.CAPTURE.route
+    ) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.scan_unknown_shelf_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_shelf, globalUnknownShelfId!!)) },
+            confirmButton = {
+                TextButton(onClick = { }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
+    if (globalUnknownZoneId != null &&
+        currentRoute != AppDestination.RETRIEVE.route
+    ) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(stringResource(R.string.scan_unknown_zone_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_zone, globalUnknownZoneId!!)) },
+            confirmButton = {
+                TextButton(onClick = { }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
     }
 
     NavHost(

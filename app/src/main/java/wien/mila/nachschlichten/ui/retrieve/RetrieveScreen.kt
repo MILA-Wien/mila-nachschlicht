@@ -1,6 +1,5 @@
 package wien.mila.nachschlichten.ui.retrieve
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +52,7 @@ fun RetrieveScreen(
         AlertDialog(
             onDismissRequest = { viewModel.clearInvalidScan() },
             title = { Text(stringResource(R.string.scan_wrong_context_title)) },
-            text = { Text(stringResource(R.string.retrieve_scan_wrong_context)) },
+            text = { Text(stringResource(R.string.scan_wrong_context)) },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearInvalidScan() }) {
                     Text(stringResource(R.string.confirm))
@@ -112,7 +111,7 @@ fun RetrieveScreen(
                 )
             }
             LinearProgressIndicator(
-                progress = { if (total > 0) totalDone.toFloat() / total else 0f },
+                progress = { totalDone.toFloat() / total },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, bottom = 8.dp)

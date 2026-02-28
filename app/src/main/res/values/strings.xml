@@ -8,10 +8,10 @@
 
     <!-- Capture Screen -->
     <string name="capture_title">Erfassen</string>
-    <string name="capture_select_shelf">Regal auswählen</string>
+    <string name="capture_select_shelf">Regal auswählen oder scannen</string>
     <string name="capture_no_shelves">Noch keine Regale vorhanden</string>
     <string name="capture_scan_hint">Artikel scannen</string>
-    <string name="capture_no_shelf_selected">Bitte zuerst ein Regal auswählen</string>
+    <string name="capture_no_shelf_selected">Bitte zuerst ein Regal auswählen oder scannen</string>
     <string name="capture_no_pending_items">Keine offenen Artikel</string>
     <string name="capture_delete_all">Alle löschen</string>
     <string name="capture_delete_all_confirm">Alle offenen Artikel für dieses Regal löschen?</string>
@@ -24,16 +24,15 @@
     <string name="article_check_mark_restock_qty">%d Stk vormerken ✓</string>
     <string name="article_check_skip">← Weiter scannen</string>
     <string name="article_check_quantity">Menge</string>
-    <string name="article_check_stock">Bestand</string>
+    <string name="article_check_stock">Bestand in Lager + Verkauf</string>
     <string name="article_check_zero_stock_warning">Nicht lagernd</string>
     <string name="article_check_zero_stock_warning_subtext">\"Kommt bald wieder\"-Kärtchen stecken</string>
-    <string name="article_check_count_hint">Stück im Regal selbst zählen!</string>
     <string name="article_check_tap_to_photo">Tippen für Foto</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Waren holen</string>
     <string name="retrieve_no_groups">Keine Warengruppen vorhanden</string>
-    <string name="retrieve_prompt">Zone auswählen</string>
+    <string name="retrieve_prompt">Zone auswählen oder scannen</string>
     <string name="retrieve_items_pending">%d offen</string>
     <string name="retrieve_progress">%1$d / %2$d erledigt</string>
 
@@ -88,10 +87,9 @@
 
     <!-- Scan context warnings -->
     <string name="scan_wrong_context_title">Falscher Barcode</string>
-    <string name="capture_scan_wrong_context">Auf diesem Bildschirm nur Regal-Barcodes scannen (shelf:…)</string>
+    <string name="scan_wrong_context">Auf diesem Bildschirm nur Regal- oder Zonen-Barcodes scannen (shelf: / zone:)</string>
     <string name="scan_unknown_shelf_title">Regal nicht gefunden</string>
     <string name="scan_unknown_shelf">Unbekanntes Regal: %s</string>
-    <string name="retrieve_scan_wrong_context">Auf diesem Bildschirm nur Zonen-Barcodes scannen (zone:…)</string>
     <string name="scan_unknown_zone_title">Zone nicht gefunden</string>
     <string name="scan_unknown_zone">Unbekannte Zone: %s</string>
 
