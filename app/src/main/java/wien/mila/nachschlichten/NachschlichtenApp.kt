@@ -10,11 +10,9 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaul
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
 import wien.mila.nachschlichten.ui.navigation.AppDestination
@@ -23,7 +21,14 @@ import wien.mila.nachschlichten.ui.navigation.NachschlichtenNavHost
 @Composable
 fun NachschlichtenApp(barcodeInputHandler: BarcodeInputHandler) {
     val navController = rememberNavController()
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestination.CAPTURE) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination: AppDestination = when (navBackStackEntry?.destination?.route) {
+        AppDestination.RETRIEVE.route, "retrieve_items/{zoneId}" -> AppDestination.RETRIEVE
+        AppDestination.SETTINGS.route,
+        "settings/shelf_edit?shelfId={shelfId}",
+        "settings/zone_edit?zoneId={zoneId}" -> AppDestination.SETTINGS
+        else -> AppDestination.CAPTURE
+    }
 
     Surface(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
     NavigationSuiteScaffold(
@@ -38,7 +43,6 @@ fun NachschlichtenApp(barcodeInputHandler: BarcodeInputHandler) {
                     selected = destination == currentDestination,
                     onClick = {
                         if (destination != currentDestination) {
-                            currentDestination = destination
                             navController.navigate(destination.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true

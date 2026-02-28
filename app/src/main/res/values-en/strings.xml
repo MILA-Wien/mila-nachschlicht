@@ -8,6 +8,8 @@
 
     <!-- Capture Screen -->
     <string name="capture_title">Capture restock items</string>
+    <string name="capture_select_shelf">Select shelf</string>
+    <string name="capture_no_shelves">No shelves configured yet</string>
     <string name="capture_scan_hint">Scan article</string>
     <string name="capture_no_shelf_selected">Please select a shelf first</string>
     <string name="capture_no_pending_items">No pending items</string>
@@ -79,6 +81,15 @@
     <string name="zone_edit_save">Save</string>
     <string name="zone_edit_delete">Delete</string>
     <string name="zone_edit_delete_confirm">Really delete this storage zone?</string>
+
+    <!-- Scan context warnings -->
+    <string name="scan_wrong_context_title">Wrong barcode</string>
+    <string name="capture_scan_wrong_context">On this screen, only scan shelf barcodes (shelf:…)</string>
+    <string name="scan_unknown_shelf_title">Shelf not found</string>
+    <string name="scan_unknown_shelf">Unknown shelf: %s</string>
+    <string name="retrieve_scan_wrong_context">On this screen, only scan zone barcodes (zone:…)</string>
+    <string name="scan_unknown_zone_title">Zone not found</string>
+    <string name="scan_unknown_zone">Unknown zone: %s</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>

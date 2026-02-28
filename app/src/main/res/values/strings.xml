@@ -8,6 +8,8 @@
 
     <!-- Capture Screen -->
     <string name="capture_title">Erfassen</string>
+    <string name="capture_select_shelf">Regal auswählen</string>
+    <string name="capture_no_shelves">Noch keine Regale vorhanden</string>
     <string name="capture_scan_hint">Artikel scannen</string>
     <string name="capture_no_shelf_selected">Bitte zuerst ein Regal auswählen</string>
     <string name="capture_no_pending_items">Keine offenen Artikel</string>
@@ -83,6 +85,15 @@
     <string name="zone_edit_save">Speichern</string>
     <string name="zone_edit_delete">Löschen</string>
     <string name="zone_edit_delete_confirm">Lagerzone wirklich löschen?</string>
+
+    <!-- Scan context warnings -->
+    <string name="scan_wrong_context_title">Falscher Barcode</string>
+    <string name="capture_scan_wrong_context">Auf diesem Bildschirm nur Regal-Barcodes scannen (shelf:…)</string>
+    <string name="scan_unknown_shelf_title">Regal nicht gefunden</string>
+    <string name="scan_unknown_shelf">Unbekanntes Regal: %s</string>
+    <string name="retrieve_scan_wrong_context">Auf diesem Bildschirm nur Zonen-Barcodes scannen (zone:…)</string>
+    <string name="scan_unknown_zone_title">Zone nicht gefunden</string>
+    <string name="scan_unknown_zone">Unbekannte Zone: %s</string>
 
     <!-- Common -->
     <string name="cancel">Abbrechen</string>

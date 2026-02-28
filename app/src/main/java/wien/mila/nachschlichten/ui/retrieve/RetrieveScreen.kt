@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,8 +44,36 @@ fun RetrieveScreen(
     val productGroups by viewModel.productGroups.collectAsStateWithLifecycle()
     val totalPending by viewModel.totalPending.collectAsStateWithLifecycle()
     val totalDone by viewModel.totalDone.collectAsStateWithLifecycle()
+    val invalidScanBarcode by viewModel.invalidScanBarcode.collectAsStateWithLifecycle()
+    val unknownZoneId by viewModel.unknownZoneId.collectAsStateWithLifecycle()
 
     val total = totalPending + totalDone
+
+    if (invalidScanBarcode != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearInvalidScan() },
+            title = { Text(stringResource(R.string.scan_wrong_context_title)) },
+            text = { Text(stringResource(R.string.retrieve_scan_wrong_context)) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearInvalidScan() }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
+
+    if (unknownZoneId != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearUnknownZone() },
+            title = { Text(stringResource(R.string.scan_unknown_zone_title)) },
+            text = { Text(stringResource(R.string.scan_unknown_zone, unknownZoneId!!)) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearUnknownZone() }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            }
+        )
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Heading row — surface background
