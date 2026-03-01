@@ -33,6 +33,7 @@ import wien.mila.nachschlichten.ui.retrieve.RetrieveViewModel
 import wien.mila.nachschlichten.ui.settings.SettingsScreen
 import wien.mila.nachschlichten.ui.settings.ShelfEditScreen
 import wien.mila.nachschlichten.ui.settings.StorageZoneEditScreen
+import wien.mila.nachschlichten.ui.settings.TechnicalSettingsScreen
 
 @Composable
 fun NachschlichtenNavHost(
@@ -211,6 +212,17 @@ fun NachschlichtenNavHost(
                 onDispose { barcodeInputHandler.isEnabled = true }
             }
             SettingsScreen(
+                onNavigateToTechnicalSettings = { navController.navigate("settings/technical") }
+            )
+        }
+
+        composable("settings/technical") {
+            DisposableEffect(Unit) {
+                barcodeInputHandler.isEnabled = false
+                onDispose { barcodeInputHandler.isEnabled = true }
+            }
+            TechnicalSettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
                 onNavigateToShelfEdit = { shelfId ->
                     val route = if (shelfId != null) "settings/shelf_edit?shelfId=$shelfId"
                     else "settings/shelf_edit"

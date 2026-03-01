@@ -64,8 +64,8 @@
     <string name="settings_add_zone">Lagerzone hinzufügen</string>
     <string name="settings_language">Sprache</string>
     <string name="settings_danger_zone">Gefahrenzone</string>
-    <string name="settings_reset_pending">Alle offenen Artikel zurücksetzen</string>
-    <string name="settings_reset_pending_confirm">Wirklich alle offenen Artikel löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_reset_pending">Alle Vormerkungen zurücksetzen</string>
+    <string name="settings_reset_pending_confirm">Wirklich alle vorgemerkten Artikel löschen? Dies kann nicht rückgängig gemacht werden.</string>
 
     <!-- Shelf Edit Screen -->
     <string name="shelf_edit_no_zone">Keine Lagerzone</string>
@@ -118,6 +118,13 @@
     <string name="transfer_import_success">Import erfolgreich.</string>
     <string name="transfer_import_success_skipped">Import erfolgreich. %d Artikel übersprungen (Regal/Artikel nicht vorhanden).</string>
 
+    <!-- Technical Configuration -->
+    <string name="settings_technical_config">Technische Konfiguration</string>
+    <string name="settings_technical_config_hint">Nur für Administrator*innen</string>
+    <string name="settings_admin_warning_title">Nur für Administrator*innen</string>
+    <string name="settings_admin_warning_message">Diese Einstellungen dürfen nur von Administrator*innen geändert werden. Möchtest du fortfahren?</string>
+    <string name="settings_admin_warning_confirm">Weiter</string>
+
     <!-- Common -->
     <string name="cancel">Abbrechen</string>
     <string name="confirm">Bestätigen</string>
@@ -134,4 +141,6 @@
     <string name="capture_item_deleted">Artikel entfernt</string>
     <string name="undo">Rückgängig</string>
     <string name="retrieve_for_shelf">Für Regal</string>
+    <string name="api_settings_section_title">API</string>
+    <string name="settings_sync">Lagerstände</string>
 </resources>
