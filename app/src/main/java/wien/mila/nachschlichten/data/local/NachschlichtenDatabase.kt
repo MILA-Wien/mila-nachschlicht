@@ -20,7 +20,7 @@ import wien.mila.nachschlichten.data.local.entity.StorageZoneEntity
         ArticleEntity::class,
         PendingItemEntity::class
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [],
     exportSchema = true
 )
@@ -31,6 +31,26 @@ abstract class NachschlichtenDatabase : RoomDatabase() {
     abstract fun pendingItemDao(): PendingItemDao
 
     companion object {
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // SQLite can't ALTER COLUMN nullability; recreate shelves with storageZoneId nullable.
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `shelves_new` (
+                        `id` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `storageZoneId` TEXT,
+                        PRIMARY KEY(`id`)
+                    )
+                """)
+                db.execSQL("""
+                    INSERT INTO `shelves_new` (`id`, `description`, `storageZoneId`)
+                    SELECT `id`, `description`, `storageZoneId` FROM `shelves`
+                """)
+                db.execSQL("DROP TABLE `shelves`")
+                db.execSQL("ALTER TABLE `shelves_new` RENAME TO `shelves`")
+            }
+        }
+
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // SQLite can't ALTER COLUMN TYPE; recreate the table.

@@ -36,6 +36,8 @@
     <string name="retrieve_items_pending">%d offen</string>
     <string name="retrieve_progress">%1$d / %2$d erledigt</string>
 
+    <string name="retrieve_no_zone">Unbekannte Zone</string>
+
     <!-- Retrieve Item List Screen -->
     <string name="retrieve_items_title">Artikel holen</string>
     <string name="retrieve_scan_hint">Artikel scannen zum Abhaken</string>
@@ -66,6 +68,7 @@
     <string name="settings_reset_pending_confirm">Wirklich alle offenen Artikel löschen? Dies kann nicht rückgängig gemacht werden.</string>
 
     <!-- Shelf Edit Screen -->
+    <string name="shelf_edit_no_zone">Keine Lagerzone</string>
     <string name="shelf_edit_title_new">Neues Regal</string>
     <string name="shelf_edit_title_edit">Regal bearbeiten</string>
     <string name="shelf_edit_id">Regal-ID (z.B. A1)</string>
@@ -92,6 +95,28 @@
     <string name="scan_unknown_shelf">Unbekanntes Regal: %s</string>
     <string name="scan_unknown_zone_title">Zone nicht gefunden</string>
     <string name="scan_unknown_zone">Unbekannte Zone: %s</string>
+
+    <!-- Transfer (Export / Import) -->
+    <string name="transfer_section_title">Datentransfer</string>
+    <string name="transfer_group_api_settings">API-Einstellungen (ohne Passwort)</string>
+    <string name="transfer_group_api_password">API-Passwort</string>
+    <string name="transfer_group_zones_shelves">Lagerzonen &amp; Regale</string>
+    <string name="transfer_group_article_images">Artikelfotos</string>
+    <string name="transfer_group_pending_items">Vorgemerkte Artikel</string>
+    <string name="transfer_export_button">Exportieren</string>
+    <string name="transfer_import_button">Importieren</string>
+    <string name="transfer_import_dialog_title">Importieren</string>
+    <string name="transfer_import_confirm">Importieren</string>
+    <string name="transfer_import_zones_shelves_summary">%1$d Zonen, %2$d Regale</string>
+    <string name="transfer_import_article_images_summary">%d Artikelfotos</string>
+    <string name="transfer_import_pending_items_summary">%d vorgemerkte Artikel</string>
+    <string name="transfer_error_parse">Datei konnte nicht gelesen werden.</string>
+    <string name="transfer_error_shelves_missing_field">%d Regal(e) mit fehlenden Pflichtfeldern – Import deaktiviert</string>
+    <string name="transfer_error_zones_missing_field">%d Zone(n) mit fehlenden Feldern – Import deaktiviert</string>
+    <string name="transfer_error_version">Nicht unterstützte Version: %d</string>
+    <string name="transfer_export_success">Export erfolgreich.</string>
+    <string name="transfer_import_success">Import erfolgreich.</string>
+    <string name="transfer_import_success_skipped">Import erfolgreich. %d Artikel übersprungen (Regal/Artikel nicht vorhanden).</string>
 
     <!-- Common -->
     <string name="cancel">Abbrechen</string>

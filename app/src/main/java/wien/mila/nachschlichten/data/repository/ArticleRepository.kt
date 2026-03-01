@@ -70,7 +70,7 @@ class ArticleRepository @Inject constructor(
                 val body = plainHttpClient.newCall(request).execute()
                     .takeIf { it.isSuccessful }?.body?.string() ?: return@withContext null
                 val json = JSONObject(body)
-                if (json.optString("status") != "success") return@withContext null
+                if (!json.optString("status").startsWith("success")) return@withContext null
                 val imageUrl = json.optJSONObject("product")
                     ?.optString("image_url")?.takeIf { it.isNotBlank() }
                     ?: return@withContext null

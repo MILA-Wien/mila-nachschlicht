@@ -18,7 +18,7 @@ import javax.inject.Inject
 data class ShelfEditUiState(
     val id: String = "",
     val description: String = "",
-    val storageZoneId: String = "",
+    val storageZoneId: String? = null,
     val isNew: Boolean = true,
     val zones: List<StorageZone> = emptyList(),
     val saved: Boolean = false
@@ -64,7 +64,7 @@ class ShelfEditViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(description = description)
     }
 
-    fun updateStorageZoneId(zoneId: String) {
+    fun updateStorageZoneId(zoneId: String?) {
         _uiState.value = _uiState.value.copy(storageZoneId = zoneId)
     }
 

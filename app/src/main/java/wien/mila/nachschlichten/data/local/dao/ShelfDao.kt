@@ -22,4 +22,7 @@ interface ShelfDao {
 
     @Query("DELETE FROM shelves WHERE id = :id")
     suspend fun delete(id: String)
+
+    @Query("SELECT * FROM shelves ORDER BY id")
+    suspend fun getAllOnce(): List<ShelfEntity>
 }

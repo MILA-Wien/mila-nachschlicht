@@ -2,6 +2,7 @@ package wien.mila.nachschlichten.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import wien.mila.nachschlichten.data.local.entity.PendingItemEntity
@@ -19,7 +20,7 @@ data class PendingItemWithArticle(
 )
 
 data class ZonePendingCount(
-    val storageZoneId: String,
+    val storageZoneId: String?,
     val pendingCount: Int
 )
 
@@ -63,6 +64,17 @@ interface PendingItemDao {
         GROUP BY s.storageZoneId
     """)
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>>
+
+    @Query("""
+        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
+        FROM pending_items p
+        INNER JOIN articles a ON a.id = p.articleId
+        INNER JOIN shelves s ON s.id = p.shelfId
+        WHERE s.storageZoneId IS NULL
+        ORDER BY p.isDone ASC, p.createdAt DESC
+    """)
+    fun getByNullZone(): Flow<List<PendingItemWithArticle>>
 
     @Query("SELECT COUNT(*) FROM pending_items WHERE isDone = 0")
     fun getPendingCount(): Flow<Int>
@@ -109,4 +121,10 @@ interface PendingItemDao {
 
     @Query("DELETE FROM pending_items WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM pending_items")
+    suspend fun getAllEntities(): List<PendingItemEntity>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnoreConflict(item: PendingItemEntity): Long
 }
