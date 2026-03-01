@@ -52,6 +52,8 @@ class PendingItemRepository @Inject constructor(
         pendingItemDao.deleteAllPending()
     }
 
+    suspend fun getById(id: Long): PendingItem? = pendingItemDao.getById(id)?.toModel()
+
     private fun PendingItemWithArticle.toModel() = PendingItem(
         id = id,
         articleId = articleId,

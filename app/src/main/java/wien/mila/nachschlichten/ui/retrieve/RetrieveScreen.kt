@@ -193,7 +193,7 @@ private fun ProductGroupCard(
         Box(modifier = Modifier.padding(16.dp)) {
             Column(modifier= Modifier.fillMaxWidth()) {
                 Text(
-                    text = group.zone.id + " " + group.zone.description,
+                    text = group.zone.reprString,
                     style = MaterialTheme.typography.titleMedium,
                     color = if (hasItems) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurfaceVariant

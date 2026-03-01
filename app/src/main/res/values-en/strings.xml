@@ -3,7 +3,7 @@
 
     <!-- Navigation -->
     <string name="nav_capture">Capture</string>
-    <string name="nav_retrieve">Retrieve</string>
+    <string name="nav_retrieve">Warehouse</string>
     <string name="nav_settings">Settings</string>
 
     <!-- Capture Screen -->
@@ -19,15 +19,15 @@
 
     <!-- Article Check Screen -->
     <string name="article_check_title">Check article</string>
-    <string name="article_check_not_found">Article not found. Please sync.</string>
     <string name="article_check_mark_restock">Mark for restock</string>
     <string name="article_check_mark_restock_qty">Mark %d for restock</string>
     <string name="article_check_skip">Skip</string>
     <string name="article_check_quantity">Quantity</string>
-    <string name="article_check_stock">Stock in storage + shop</string>
+    <string name="article_check_stock">in storage + shop</string>
     <string name="article_check_zero_stock_warning">Out of stock</string>
     <string name="article_check_zero_stock_warning_subtext">Tuck \"Kommt bald wieder\" card</string>
     <string name="article_check_tap_to_photo">Tap to take photo</string>
+    <string name="article_image_capture">Take photo</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Retrieve items</string>
@@ -50,10 +50,8 @@
     <string name="settings_api_url_hint">https://example.com/api</string>
     <string name="settings_api_username">Username</string>
     <string name="settings_api_password">Password</string>
-    <string name="settings_sync">Sync</string>
-    <string name="settings_sync_now">Sync now</string>
+    <string name="settings_sync_now">Fetch stock levels</string>
     <string name="settings_article_count">%1$d articles in database, %2$d with EAN</string>
-    <string name="settings_last_sync">Last sync: %s</string>
     <string name="settings_never_synced">Never synced</string>
     <string name="settings_syncing">Syncing…</string>
     <string name="settings_shelves">Shelves</string>
@@ -105,4 +103,5 @@
     <string name="sync_indicator_never">Never synced</string>
     <string name="sync_indicator_error">Sync failed</string>
     <string name="sync_error_detail_title">Error details</string>
+    <string name="capture_articles_captured">articles marked for restock</string>
 </resources>

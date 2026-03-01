@@ -11,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import wien.mila.nachschlichten.data.remote.NachschlichtenApi
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -20,6 +21,16 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideCredentialHolder(): CredentialHolder = CredentialHolder()
+
+    @Provides
+    @Singleton
+    @Named("plain")
+    fun providePlainOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+    }
 
     @Provides
     @Singleton

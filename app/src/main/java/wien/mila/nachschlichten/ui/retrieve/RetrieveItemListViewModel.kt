@@ -4,9 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -15,15 +18,8 @@ import wien.mila.nachschlichten.data.repository.PendingItemRepository
 import wien.mila.nachschlichten.data.repository.StorageZoneRepository
 import wien.mila.nachschlichten.domain.model.PendingItem
 import wien.mila.nachschlichten.domain.model.StorageZone
+import wien.mila.nachschlichten.ui.common.TimedErrorState
 import javax.inject.Inject
-
-data class ScanResult(
-    val pendingItem: PendingItem?,
-    val articleName: String?,
-    val shelfId: String?,
-    val quantity: Int?,
-    val notInList: Boolean = false
-)
 
 @HiltViewModel
 class RetrieveItemListViewModel @Inject constructor(
@@ -41,8 +37,11 @@ class RetrieveItemListViewModel @Inject constructor(
     private val _zone = MutableStateFlow<StorageZone?>(null)
     val zone: StateFlow<StorageZone?> = _zone.asStateFlow()
 
-    private val _scanResult = MutableStateFlow<ScanResult?>(null)
-    val scanResult: StateFlow<ScanResult?> = _scanResult.asStateFlow()
+    private val _navigateToCheck = MutableSharedFlow<Long>()
+    val navigateToCheck: SharedFlow<Long> = _navigateToCheck.asSharedFlow()
+
+    private val timedNotInList = TimedErrorState(viewModelScope)
+    val notInListEan: StateFlow<String?> = timedNotInList.value
 
     init {
         viewModelScope.launch {
@@ -55,33 +54,10 @@ class RetrieveItemListViewModel @Inject constructor(
             val items = pendingItems.value
             val match = items.firstOrNull { it.articleEan == ean && !it.isDone }
             if (match != null) {
-                _scanResult.value = ScanResult(
-                    pendingItem = match,
-                    articleName = match.articleName,
-                    shelfId = match.shelfId,
-                    quantity = match.quantity
-                )
+                _navigateToCheck.emit(match.id)
             } else {
-                val article = articleRepository.getByEan(ean)
-                _scanResult.value = ScanResult(
-                    pendingItem = null,
-                    articleName = article?.name,
-                    shelfId = null,
-                    quantity = null,
-                    notInList = true
-                )
+                timedNotInList.show(ean)
             }
         }
-    }
-
-    fun markDone(itemId: Long) {
-        viewModelScope.launch {
-            pendingItemRepository.markDone(itemId)
-            _scanResult.value = null
-        }
-    }
-
-    fun dismissScanResult() {
-        _scanResult.value = null
     }
 }

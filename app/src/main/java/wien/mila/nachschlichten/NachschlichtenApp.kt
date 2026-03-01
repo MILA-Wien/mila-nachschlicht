@@ -22,11 +22,10 @@ import wien.mila.nachschlichten.ui.navigation.NachschlichtenNavHost
 fun NachschlichtenApp(barcodeInputHandler: BarcodeInputHandler) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination: AppDestination = when (navBackStackEntry?.destination?.route) {
-        AppDestination.RETRIEVE.route, "retrieve_items/{zoneId}" -> AppDestination.RETRIEVE
-        AppDestination.SETTINGS.route,
-        "settings/shelf_edit?shelfId={shelfId}",
-        "settings/zone_edit?zoneId={zoneId}" -> AppDestination.SETTINGS
+    val route = navBackStackEntry?.destination?.route
+    val currentDestination: AppDestination = when {
+        route?.startsWith("retrieve") == true -> AppDestination.RETRIEVE
+        route?.startsWith("settings") == true -> AppDestination.SETTINGS
         else -> AppDestination.CAPTURE
     }
 

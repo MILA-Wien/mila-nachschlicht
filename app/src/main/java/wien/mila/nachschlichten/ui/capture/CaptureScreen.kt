@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.capture
 
+import android.graphics.Typeface
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import wien.mila.nachschlichten.R
 
 @Composable
@@ -122,42 +127,22 @@ fun CaptureScreen(
                 }
             }
         } else {
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(R.raw.tag_scan)
+                )
+                val fontMap = remember {
+                    mapOf("Roboto-Black" to Typeface.create("sans-serif-black", Typeface.NORMAL))
+                }
+                LottieAnimation(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    fontMap = fontMap,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.capture_scan_hint),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+                )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        // Pending items header
-        if (pendingItems.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "${pendingItems.size} Artikel",
-                    style = MaterialTheme.typography.titleSmall
-                )
-                IconButton(onClick = { showDeleteDialog = true }) {
-                    Icon(Icons.Default.DeleteSweep, contentDescription = stringResource(R.string.capture_delete_all))
-                }
-            }
-        }
 
         // Pending items list
         if (pendingItems.isEmpty()) {
@@ -174,6 +159,19 @@ fun CaptureScreen(
                 )
             }
         } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${pendingItems.size} ${stringResource(R.string.capture_articles_captured)}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                IconButton(onClick = { showDeleteDialog = true }) {
+                    Icon(Icons.Default.DeleteSweep, contentDescription = stringResource(R.string.capture_delete_all))
+                }
+            }
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)

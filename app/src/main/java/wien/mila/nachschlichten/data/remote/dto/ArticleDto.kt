@@ -9,5 +9,6 @@ data class ArticleDto(
     @SerializedName("kurzname") val shortName: String,
     @SerializedName("einheit") val unit: String?,
     @SerializedName("lagerstand") val totalStock: Double,
-    @SerializedName("vk") val price: Double
+    @SerializedName("vk") val priceNet: Double,
+    @SerializedName("mwst") val taxPercentage: Double
 )

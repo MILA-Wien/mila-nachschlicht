@@ -78,6 +78,15 @@ interface PendingItemDao {
     @Query("DELETE FROM pending_items WHERE shelfId = :shelfId AND isDone = 0")
     suspend fun deleteAllPendingForShelf(shelfId: String)
 
-    @Query("DELETE FROM pending_items WHERE isDone = 0")
+    @Query("DELETE FROM pending_items")
     suspend fun deleteAllPending()
+
+    @Query("""
+        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+               p.shelfId, p.quantity, p.createdAt, p.isDone
+        FROM pending_items p
+        INNER JOIN articles a ON a.id = p.articleId
+        WHERE p.id = :id
+    """)
+    suspend fun getById(id: Long): PendingItemWithArticle?
 }

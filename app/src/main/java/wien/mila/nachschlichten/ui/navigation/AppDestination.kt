@@ -1,7 +1,7 @@
 package wien.mila.nachschlichten.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,6 +13,6 @@ enum class AppDestination(
     val icon: ImageVector
 ) {
     CAPTURE("capture", R.string.nav_capture, Icons.Default.QrCodeScanner),
-    RETRIEVE("retrieve", R.string.nav_retrieve, Icons.Default.Inventory2),
+    RETRIEVE("retrieve", R.string.nav_retrieve, Icons.Default.Inventory),
     SETTINGS("settings", R.string.nav_settings, Icons.Default.Settings)
 }

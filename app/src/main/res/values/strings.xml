@@ -3,7 +3,7 @@
 
     <!-- Navigation -->
     <string name="nav_capture">Erfassen</string>
-    <string name="nav_retrieve">Holen</string>
+    <string name="nav_retrieve">Lager</string>
     <string name="nav_settings">Einstellungen</string>
 
     <!-- Capture Screen -->
@@ -19,15 +19,15 @@
 
     <!-- Article Check Screen -->
     <string name="article_check_title">Artikel prüfen</string>
-    <string name="article_check_not_found">Artikel nicht gefunden. Bitte synchronisieren.</string>
-    <string name="article_check_mark_restock">Vormerken ✓</string>
-    <string name="article_check_mark_restock_qty">%d Stk vormerken ✓</string>
+    <string name="article_check_mark_restock">Vormerken</string>
+    <string name="article_check_mark_restock_qty">Vormerken: %d Stk</string>
     <string name="article_check_skip">← Weiter scannen</string>
     <string name="article_check_quantity">Menge</string>
-    <string name="article_check_stock">Bestand in Lager + Verkauf</string>
+    <string name="article_check_stock">in Lager + Verkauf</string>
     <string name="article_check_zero_stock_warning">Nicht lagernd</string>
     <string name="article_check_zero_stock_warning_subtext">\"Kommt bald wieder\"-Kärtchen stecken</string>
     <string name="article_check_tap_to_photo">Tippen für Foto</string>
+    <string name="article_image_capture">Foto aufnehmen</string>
 
     <!-- Retrieve Screen -->
     <string name="retrieve_title">Waren holen</string>
@@ -50,10 +50,8 @@
     <string name="settings_api_url_hint">https://example.com/api</string>
     <string name="settings_api_username">Benutzername</string>
     <string name="settings_api_password">Passwort</string>
-    <string name="settings_sync">Synchronisieren</string>
-    <string name="settings_sync_now">Jetzt synchronisieren</string>
+    <string name="settings_sync_now">Lagerstände abrufen</string>
     <string name="settings_article_count">%1$d Artikel in der Datenbank, davon %2$d mit EAN</string>
-    <string name="settings_last_sync">Letzte Synchronisation: %s</string>
     <string name="settings_never_synced">Noch nie synchronisiert</string>
     <string name="settings_syncing">Synchronisiere…</string>
     <string name="settings_shelves">Regale</string>
@@ -105,4 +103,5 @@
     <string name="sync_indicator_never">Nie synchronisiert</string>
     <string name="sync_indicator_error">Synchronisation fehlgeschlagen</string>
     <string name="sync_error_detail_title">Fehlerdetails</string>
+    <string name="capture_articles_captured">Artikel vorgemerkt</string>
 </resources>

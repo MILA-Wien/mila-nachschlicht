@@ -2,7 +2,7 @@
 agp = "9.0.1"
 kotlin = "2.3.10"
 ksp = "2.3.6"
-composeBom = "2026.02.00"
+composeBom = "2026.02.01"
 coreKtx = "1.17.0"
 appcompat = "1.7.1"
 activityCompose = "1.12.4"
@@ -63,6 +63,7 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 
 # Coil
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
 # Retrofit + OkHttp
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
