@@ -98,7 +98,8 @@ fun ShelfEditScreen(
                 onExpandedChange = { expanded = it }
             ) {
                 OutlinedTextField(
-                    value = uiState.zones.find { it.id == uiState.storageZoneId }?.let { "${it.id} ${it.description}" } ?: "",
+                    value = uiState.zones.find { it.id == uiState.storageZoneId }?.let { "${it.id} ${it.description}" }
+                        ?: stringResource(R.string.shelf_edit_no_zone),
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.shelf_edit_zone)) },
@@ -111,6 +112,13 @@ fun ShelfEditScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.shelf_edit_no_zone)) },
+                        onClick = {
+                            viewModel.updateStorageZoneId(null)
+                            expanded = false
+                        }
+                    )
                     uiState.zones.forEach { zone ->
                         DropdownMenuItem(
                             text = { Text("${zone.id} ${zone.description}") },
@@ -130,7 +138,7 @@ fun ShelfEditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = uiState.id.isNotBlank() && uiState.storageZoneId.isNotBlank()
+                enabled = uiState.id.isNotBlank()
             ) {
                 Text(stringResource(R.string.shelf_edit_save))
             }

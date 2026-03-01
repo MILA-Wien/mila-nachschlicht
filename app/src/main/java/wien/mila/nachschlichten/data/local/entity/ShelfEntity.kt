@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class ShelfEntity(
     @PrimaryKey val id: String,
     val description: String,
-    val storageZoneId: String
+    val storageZoneId: String?
 )

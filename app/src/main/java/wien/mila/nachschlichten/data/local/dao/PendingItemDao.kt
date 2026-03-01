@@ -20,7 +20,7 @@ data class PendingItemWithArticle(
 )
 
 data class ZonePendingCount(
-    val storageZoneId: String,
+    val storageZoneId: String?,
     val pendingCount: Int
 )
 
@@ -64,6 +64,17 @@ interface PendingItemDao {
         GROUP BY s.storageZoneId
     """)
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>>
+
+    @Query("""
+        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
+        FROM pending_items p
+        INNER JOIN articles a ON a.id = p.articleId
+        INNER JOIN shelves s ON s.id = p.shelfId
+        WHERE s.storageZoneId IS NULL
+        ORDER BY p.isDone ASC, p.createdAt DESC
+    """)
+    fun getByNullZone(): Flow<List<PendingItemWithArticle>>
 
     @Query("SELECT COUNT(*) FROM pending_items WHERE isDone = 0")
     fun getPendingCount(): Flow<Int>

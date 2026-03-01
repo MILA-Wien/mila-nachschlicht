@@ -21,7 +21,8 @@ class PendingItemRepository @Inject constructor(
         pendingItemDao.getAllPending().map { list -> list.map { it.toModel() } }
 
     fun getByZone(zoneId: String): Flow<List<PendingItem>> =
-        pendingItemDao.getByZone(zoneId).map { list -> list.map { it.toModel() } }
+        if (zoneId.isEmpty()) pendingItemDao.getByNullZone().map { list -> list.map { it.toModel() } }
+        else pendingItemDao.getByZone(zoneId).map { list -> list.map { it.toModel() } }
 
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>> =
         pendingItemDao.getPendingCountByZone()

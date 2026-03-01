@@ -291,7 +291,7 @@ fun SettingsScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = shelf.id, style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            text = "${shelf.description} → ${shelf.storageZoneId}",
+                            text = "${shelf.description} → ${shelf.storageZoneId ?: "-"}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -317,11 +317,6 @@ fun SettingsScreen(
                     label = stringResource(R.string.transfer_group_api_settings),
                     checked = transferUiState.exportOptions.includeApiSettings,
                     onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeApiSettings = it)) }
-                )
-                TransferGroupCheckbox(
-                    label = stringResource(R.string.transfer_group_api_password),
-                    checked = transferUiState.exportOptions.includeApiPassword,
-                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeApiPassword = it)) }
                 )
                 TransferGroupCheckbox(
                     label = stringResource(R.string.transfer_group_zones_shelves),
@@ -445,24 +440,38 @@ fun SettingsScreen(
                         enabled = importFile.apiSettings != null,
                         onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeApiSettings = it)) }
                     )
-                    TransferGroupCheckbox(
-                        label = stringResource(R.string.transfer_group_api_password),
-                        checked = importOpts.includeApiPassword,
-                        enabled = importFile.apiPassword != null,
-                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeApiPassword = it)) }
-                    )
                     val zonesCount = importFile.zones?.size ?: 0
                     val shelvesCount = importFile.shelves?.size ?: 0
                     val hasZonesShelves = importFile.zones != null || importFile.shelves != null
+                    val zonesShelvesError = transferUiState.importZonesShelvesError
                     TransferGroupCheckbox(
                         label = if (hasZonesShelves)
                             stringResource(R.string.transfer_group_zones_shelves) + " (" +
                             stringResource(R.string.transfer_import_zones_shelves_summary, zonesCount, shelvesCount) + ")"
                         else stringResource(R.string.transfer_group_zones_shelves),
                         checked = importOpts.includeZonesAndShelves,
-                        enabled = hasZonesShelves,
+                        enabled = hasZonesShelves && zonesShelvesError == null,
                         onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeZonesAndShelves = it)) }
                     )
+                    zonesShelvesError?.let { errMsg ->
+                        val errText = when {
+                            errMsg.startsWith("shelves_missing_field:") -> {
+                                val count = errMsg.removePrefix("shelves_missing_field:").toIntOrNull() ?: 0
+                                stringResource(R.string.transfer_error_shelves_missing_field, count)
+                            }
+                            errMsg.startsWith("zones_missing_field:") -> {
+                                val count = errMsg.removePrefix("zones_missing_field:").toIntOrNull() ?: 0
+                                stringResource(R.string.transfer_error_zones_missing_field, count)
+                            }
+                            else -> errMsg
+                        }
+                        Text(
+                            text = errText,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 48.dp)
+                        )
+                    }
                     val imagesCount = importFile.articleImages?.size ?: 0
                     TransferGroupCheckbox(
                         label = if (importFile.articleImages != null)

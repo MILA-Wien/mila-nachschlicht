@@ -28,13 +28,18 @@ class RetrieveViewModel @Inject constructor(
         pendingItemRepository.getPendingCountByZone()
     ) { zones, shelves, counts ->
         val countMap = counts.associate { it.storageZoneId to it.pendingCount }
-        zones.map { zone ->
+        val zoneGroups = zones.map { zone ->
             ProductGroup(
                 zone = zone,
                 pendingCount = countMap[zone.id] ?: 0,
                 shelves = shelves.filter { it.storageZoneId == zone.id }
             )
         }
+        val noZoneShelves = shelves.filter { it.storageZoneId == null }
+        val noZoneGroup = if (noZoneShelves.isNotEmpty())
+            listOf(ProductGroup(zone = null, pendingCount = countMap[null] ?: 0, shelves = noZoneShelves))
+        else emptyList()
+        zoneGroups + noZoneGroup
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val totalPending: StateFlow<Int> = pendingItemRepository.getPendingCount()
@@ -52,7 +57,7 @@ class RetrieveViewModel @Inject constructor(
     fun onBarcodeScan(barcode: String) {
         if (barcode.startsWith("zone:")) {
             val zoneId = barcode.removePrefix("zone:")
-            if (!productGroups.value.any { it.zone.id == zoneId }) {
+            if (!productGroups.value.any { it.zone?.id == zoneId }) {
                 _unknownZoneId.value = zoneId
             }
             // valid zone ID: global handler navigates, nothing to do here

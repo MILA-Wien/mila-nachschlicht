@@ -6,9 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import wien.mila.nachschlichten.data.repository.PendingItemRepository
 import wien.mila.nachschlichten.data.repository.ShelfRepository
 import wien.mila.nachschlichten.data.repository.StorageZoneRepository
 import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
@@ -18,7 +20,8 @@ import javax.inject.Inject
 class GlobalNavigationViewModel @Inject constructor(
     barcodeInputHandler: BarcodeInputHandler,
     shelfRepository: ShelfRepository,
-    storageZoneRepository: StorageZoneRepository
+    storageZoneRepository: StorageZoneRepository,
+    pendingItemRepository: PendingItemRepository
 ) : ViewModel() {
 
     private val shelves = shelfRepository.getAll()
@@ -26,6 +29,9 @@ class GlobalNavigationViewModel @Inject constructor(
 
     private val zones = storageZoneRepository.getAll()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val pendingCount: StateFlow<Int> = pendingItemRepository.getPendingCount()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
 
     private val _navigateToCapture = MutableSharedFlow<String>(extraBufferCapacity = 1)
     val navigateToCapture: SharedFlow<String> = _navigateToCapture.asSharedFlow()

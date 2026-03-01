@@ -64,7 +64,7 @@ fun RetrieveItemListScreen(
     val zone by viewModel.zone.collectAsStateWithLifecycle()
     val pendingItems by viewModel.pendingItems.collectAsStateWithLifecycle()
     val notInListEan by viewModel.notInListEan.collectAsStateWithLifecycle()
-    val zoneColor = try {
+    val zoneColor = if (zone == null) Color.Gray else try {
         Color(zone!!.color.toColorInt())
     } catch (_: Exception) {
         MaterialTheme.colorScheme.primaryContainer
@@ -87,7 +87,7 @@ fun RetrieveItemListScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(zone?.reprString ?: stringResource(R.string.retrieve_items_title)) },
+                title = { Text(zone?.reprString ?: stringResource(R.string.retrieve_no_zone)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)

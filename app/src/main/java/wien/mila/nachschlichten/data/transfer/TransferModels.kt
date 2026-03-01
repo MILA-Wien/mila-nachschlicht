@@ -4,7 +4,6 @@ data class TransferFile(
     val version: Int = 1,
     val exportedAt: Long,
     val apiSettings: TransferApiSettings?,
-    val apiPassword: TransferApiPassword?,
     val zones: List<TransferZone>?,
     val shelves: List<TransferShelf>?,
     val articleImages: List<TransferArticleImage>?,
@@ -13,16 +12,14 @@ data class TransferFile(
 
 data class TransferOptions(
     val includeApiSettings: Boolean = true,
-    val includeApiPassword: Boolean = false,
     val includeZonesAndShelves: Boolean = true,
     val includeArticleImages: Boolean = true,
     val includePendingItems: Boolean = false
 )
 
 data class TransferApiSettings(val apiUrl: String, val username: String)
-data class TransferApiPassword(val password: String)
 data class TransferZone(val id: String, val description: String, val color: String)
-data class TransferShelf(val id: String, val description: String, val storageZoneId: String)
+data class TransferShelf(val id: String, val description: String, val storageZoneId: String?)
 
 // Exactly one of imagePath or imageData is non-null
 data class TransferArticleImage(val articleId: Long, val imagePath: String?, val imageData: String?)

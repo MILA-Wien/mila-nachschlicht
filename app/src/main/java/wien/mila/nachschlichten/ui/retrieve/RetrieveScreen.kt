@@ -149,10 +149,10 @@ fun RetrieveScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(productGroups, key = { it.zone.id }) { group ->
+                items(productGroups, key = { it.zone?.id ?: "" }) { group ->
                     ProductGroupCard(
                         group = group,
-                        onClick = { /*if (group.pendingCount > 0)*/ onNavigateToItems(group.zone.id) }
+                        onClick = { onNavigateToItems(group.zone?.id ?: "") }
                     )
                 }
             }
@@ -166,7 +166,7 @@ private fun ProductGroupCard(
     group: ProductGroup,
     onClick: () -> Unit
 ) {
-    val zoneColor = try {
+    val zoneColor = if (group.zone == null) Color.Gray else try {
         Color(group.zone.color.toColorInt())
     } catch (_: Exception) {
         MaterialTheme.colorScheme.primaryContainer
@@ -193,7 +193,7 @@ private fun ProductGroupCard(
         Box(modifier = Modifier.padding(16.dp)) {
             Column(modifier= Modifier.fillMaxWidth()) {
                 Text(
-                    text = group.zone.reprString,
+                    text = group.zone?.reprString ?: stringResource(R.string.retrieve_no_zone),
                     style = MaterialTheme.typography.titleMedium,
                     color = if (hasItems) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurfaceVariant

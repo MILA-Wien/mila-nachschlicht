@@ -34,10 +34,6 @@ class TransferRepository @Inject constructor(
             )
         } else null
 
-        val apiPassword = if (options.includeApiPassword) {
-            TransferApiPassword(password = userPreferences.getPasswordOnce())
-        } else null
-
         val zones = if (options.includeZonesAndShelves) {
             storageZoneDao.getAllOnce().map { TransferZone(it.id, it.description, it.color) }
         } else null
@@ -74,7 +70,6 @@ class TransferRepository @Inject constructor(
         return TransferFile(
             exportedAt = System.currentTimeMillis(),
             apiSettings = apiSettings,
-            apiPassword = apiPassword,
             zones = zones,
             shelves = shelves,
             articleImages = articleImages,
@@ -86,10 +81,6 @@ class TransferRepository @Inject constructor(
         if (options.includeApiSettings && file.apiSettings != null) {
             userPreferences.setApiUrl(file.apiSettings.apiUrl)
             userPreferences.setUsername(file.apiSettings.username)
-        }
-
-        if (options.includeApiPassword && file.apiPassword != null) {
-            userPreferences.setPassword(file.apiPassword.password)
         }
 
         if (options.includeZonesAndShelves) {

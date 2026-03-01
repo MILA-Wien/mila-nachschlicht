@@ -31,7 +31,8 @@ data class TransferUiState(
     val successMessage: String? = null,
     val pendingImportFile: TransferFile? = null,
     val exportOptions: TransferOptions = TransferOptions(),
-    val importOptions: TransferOptions = TransferOptions()
+    val importOptions: TransferOptions = TransferOptions(),
+    val importZonesShelvesError: String? = null
 )
 
 @HiltViewModel
@@ -104,11 +105,28 @@ class TransferViewModel @Inject constructor(
                     return@launch
                 }
 
+                // Kotlin non-nullable fields can be null at runtime when set by Gson
+                @Suppress("SENSELESS_COMPARISON")
+                val invalidShelves = transferFile.shelves?.count {
+                    it.id == null || it.description == null
+                } ?: 0
+
+                @Suppress("SENSELESS_COMPARISON")
+                val invalidZones = transferFile.zones?.count {
+                    it.id == null || it.description == null || it.color == null
+                } ?: 0
+
+                val zonesShelvesError: String? = when {
+                    invalidShelves > 0 -> "shelves_missing_field:$invalidShelves"
+                    invalidZones > 0 -> "zones_missing_field:$invalidZones"
+                    else -> null
+                }
+
                 // Preset import options based on what's in the file
                 val presetOptions = TransferOptions(
                     includeApiSettings = transferFile.apiSettings != null,
-                    includeApiPassword = transferFile.apiPassword != null,
-                    includeZonesAndShelves = transferFile.zones != null || transferFile.shelves != null,
+                    includeZonesAndShelves = (transferFile.zones != null || transferFile.shelves != null)
+                                             && zonesShelvesError == null,
                     includeArticleImages = transferFile.articleImages != null,
                     includePendingItems = transferFile.pendingItems != null
                 )
@@ -116,7 +134,8 @@ class TransferViewModel @Inject constructor(
                 _uiState.update { it.copy(
                     isWorking = false,
                     pendingImportFile = transferFile,
-                    importOptions = presetOptions
+                    importOptions = presetOptions,
+                    importZonesShelvesError = zonesShelvesError
                 ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isWorking = false, errorMessage = "parse_error") }
@@ -142,6 +161,6 @@ class TransferViewModel @Inject constructor(
     }
 
     fun onImportCancelled() {
-        _uiState.update { it.copy(pendingImportFile = null) }
+        _uiState.update { it.copy(pendingImportFile = null, importZonesShelvesError = null) }
     }
 }
