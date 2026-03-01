@@ -18,7 +18,7 @@
     <string name="capture_unknown_ean">Unbekannte EAN: %s</string>
 
     <!-- Article Check Screen -->
-    <string name="article_check_title">Artikel prüfen</string>
+    <string name="article_check_title">Artikel vormerken</string>
     <string name="article_check_mark_restock">Vormerken</string>
     <string name="article_check_mark_restock_qty">Vormerken: %d Stk</string>
     <string name="article_check_skip">← Weiter scannen</string>
@@ -43,6 +43,8 @@
     <string name="retrieve_no_pending">Alle Artikel erledigt!</string>
     <string name="retrieve_scan_result_title">Gescannter Artikel</string>
     <string name="retrieve_item_not_in_list">Artikel nicht in der Liste</string>
+    <string name="retrieve_item_marked_done">Als erledigt markiert</string>
+    <string name="retrieve_item_marked_pending">Als offen markiert</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Einstellungen</string>
@@ -104,4 +106,7 @@
     <string name="sync_indicator_error">Synchronisation fehlgeschlagen</string>
     <string name="sync_error_detail_title">Fehlerdetails</string>
     <string name="capture_articles_captured">Artikel vorgemerkt</string>
+    <string name="capture_item_deleted">Artikel entfernt</string>
+    <string name="undo">Rückgängig</string>
+    <string name="retrieve_for_shelf">Für Regal</string>
 </resources>

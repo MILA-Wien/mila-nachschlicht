@@ -14,7 +14,8 @@ data class PendingItemWithArticle(
     val shelfId: String,
     val quantity: Int?,
     val createdAt: Long,
-    val isDone: Boolean
+    val isDone: Boolean,
+    val imagePath: String?
 )
 
 data class ZonePendingCount(
@@ -26,7 +27,7 @@ data class ZonePendingCount(
 interface PendingItemDao {
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.shelfId = :shelfId AND p.isDone = 0
@@ -36,7 +37,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.isDone = 0
@@ -46,7 +47,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         INNER JOIN shelves s ON s.id = p.shelfId
@@ -75,6 +76,9 @@ interface PendingItemDao {
     @Query("UPDATE pending_items SET isDone = 1 WHERE id = :id")
     suspend fun markDone(id: Long)
 
+    @Query("UPDATE pending_items SET isDone = 0 WHERE id = :id")
+    suspend fun unmarkDone(id: Long)
+
     @Query("DELETE FROM pending_items WHERE shelfId = :shelfId AND isDone = 0")
     suspend fun deleteAllPendingForShelf(shelfId: String)
 
@@ -83,10 +87,26 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.id = :id
     """)
     suspend fun getById(id: Long): PendingItemWithArticle?
+
+    @Query("""
+        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
+        FROM pending_items p
+        INNER JOIN articles a ON a.id = p.articleId
+        WHERE p.articleId = :articleId AND p.shelfId = :shelfId AND p.isDone = 0
+        LIMIT 1
+    """)
+    suspend fun getByArticleAndShelf(articleId: Long, shelfId: String): PendingItemWithArticle?
+
+    @Query("UPDATE pending_items SET quantity = :quantity WHERE id = :id")
+    suspend fun updateQuantity(id: Long, quantity: Int?)
+
+    @Query("DELETE FROM pending_items WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }

@@ -44,6 +44,8 @@ class PendingItemRepository @Inject constructor(
         pendingItemDao.markDone(id)
     }
 
+    suspend fun unmarkDone(id: Long) = pendingItemDao.unmarkDone(id)
+
     suspend fun deleteAllPendingForShelf(shelfId: String) {
         pendingItemDao.deleteAllPendingForShelf(shelfId)
     }
@@ -54,6 +56,14 @@ class PendingItemRepository @Inject constructor(
 
     suspend fun getById(id: Long): PendingItem? = pendingItemDao.getById(id)?.toModel()
 
+    suspend fun getByArticleAndShelf(articleId: Long, shelfId: String): PendingItem? =
+        pendingItemDao.getByArticleAndShelf(articleId, shelfId)?.toModel()
+
+    suspend fun updateQuantity(id: Long, quantity: Int?) =
+        pendingItemDao.updateQuantity(id, quantity)
+
+    suspend fun deleteById(id: Long) = pendingItemDao.deleteById(id)
+
     private fun PendingItemWithArticle.toModel() = PendingItem(
         id = id,
         articleId = articleId,
@@ -62,6 +72,7 @@ class PendingItemRepository @Inject constructor(
         shelfId = shelfId,
         quantity = quantity,
         createdAt = createdAt,
-        isDone = isDone
+        isDone = isDone,
+        imagePath = imagePath
     )
 }

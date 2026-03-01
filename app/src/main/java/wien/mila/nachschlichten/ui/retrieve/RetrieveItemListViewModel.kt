@@ -49,6 +49,14 @@ class RetrieveItemListViewModel @Inject constructor(
         }
     }
 
+    fun markDone(id: Long) {
+        viewModelScope.launch { pendingItemRepository.markDone(id) }
+    }
+
+    fun unmarkDone(id: Long) {
+        viewModelScope.launch { pendingItemRepository.unmarkDone(id) }
+    }
+
     fun onBarcodeScan(ean: String) {
         viewModelScope.launch {
             val items = pendingItems.value

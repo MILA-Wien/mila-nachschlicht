@@ -59,4 +59,12 @@ class CaptureViewModel @Inject constructor(
             pendingItemRepository.deleteAllPendingForShelf(shelfId)
         }
     }
+
+    fun deletePendingItem(id: Long) {
+        viewModelScope.launch { pendingItemRepository.deleteById(id) }
+    }
+
+    fun restorePendingItem(articleId: Long, shelfId: String, quantity: Int?) {
+        viewModelScope.launch { pendingItemRepository.insert(articleId, shelfId, quantity) }
+    }
 }

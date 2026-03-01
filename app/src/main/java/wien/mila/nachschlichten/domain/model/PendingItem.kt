@@ -8,5 +8,6 @@ data class PendingItem(
     val shelfId: String,
     val quantity: Int?,
     val createdAt: Long,
-    val isDone: Boolean
+    val isDone: Boolean,
+    val imagePath: String?
 )

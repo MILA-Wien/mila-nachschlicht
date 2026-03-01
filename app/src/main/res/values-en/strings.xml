@@ -18,7 +18,7 @@
     <string name="capture_unknown_ean">Unknown EAN: %s</string>
 
     <!-- Article Check Screen -->
-    <string name="article_check_title">Check article</string>
+    <string name="article_check_title">Mark article for restock</string>
     <string name="article_check_mark_restock">Mark for restock</string>
     <string name="article_check_mark_restock_qty">Mark %d for restock</string>
     <string name="article_check_skip">Skip</string>
@@ -43,6 +43,8 @@
     <string name="retrieve_no_pending">All items done!</string>
     <string name="retrieve_scan_result_title">Scanned article</string>
     <string name="retrieve_item_not_in_list">Article not in list</string>
+    <string name="retrieve_item_marked_done">Marked as done</string>
+    <string name="retrieve_item_marked_pending">Marked as pending</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
@@ -104,4 +106,7 @@
     <string name="sync_indicator_error">Sync failed</string>
     <string name="sync_error_detail_title">Error details</string>
     <string name="capture_articles_captured">articles marked for restock</string>
+    <string name="capture_item_deleted">Item removed</string>
+    <string name="undo">Undo</string>
+    <string name="retrieve_for_shelf">For shelf</string>
 </resources>
