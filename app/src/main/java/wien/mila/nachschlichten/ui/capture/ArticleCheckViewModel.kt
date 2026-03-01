@@ -10,11 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import wien.mila.nachschlichten.data.repository.ArticleRepository
 import wien.mila.nachschlichten.data.repository.PendingItemRepository
+import wien.mila.nachschlichten.data.repository.ShelfRepository
 import wien.mila.nachschlichten.domain.model.Article
+import wien.mila.nachschlichten.domain.model.Shelf
 import javax.inject.Inject
 
 data class ArticleCheckUiState(
     val article: Article? = null,
+    val shelf: Shelf? = null,
     val isLoading: Boolean = true,
     val quantity: Int? = null,
     val saved: Boolean = false,
@@ -25,7 +28,8 @@ data class ArticleCheckUiState(
 class ArticleCheckViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val articleRepository: ArticleRepository,
-    private val pendingItemRepository: PendingItemRepository
+    private val pendingItemRepository: PendingItemRepository,
+    private val shelfRepository: ShelfRepository
 ) : ViewModel() {
 
     private val ean: String = savedStateHandle["ean"] ?: ""
@@ -40,11 +44,13 @@ class ArticleCheckViewModel @Inject constructor(
 
     private fun loadArticle() {
         viewModelScope.launch {
+            val shelf = shelfRepository.getById(shelfId)
             val article = articleRepository.getByEan(ean)
             if (article != null) {
                 val existing = pendingItemRepository.getByArticleAndShelf(article.id, shelfId)
                 _uiState.value = ArticleCheckUiState(
                     article = article,
+                    shelf = shelf,
                     isLoading = false,
                     quantity = existing?.quantity,
                     existingPendingItemId = existing?.id
