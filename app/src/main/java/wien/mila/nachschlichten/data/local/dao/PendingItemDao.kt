@@ -14,7 +14,8 @@ data class PendingItemWithArticle(
     val shelfId: String,
     val quantity: Int?,
     val createdAt: Long,
-    val isDone: Boolean
+    val isDone: Boolean,
+    val imagePath: String?
 )
 
 data class ZonePendingCount(
@@ -26,7 +27,7 @@ data class ZonePendingCount(
 interface PendingItemDao {
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.shelfId = :shelfId AND p.isDone = 0
@@ -36,7 +37,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.isDone = 0
@@ -46,7 +47,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         INNER JOIN shelves s ON s.id = p.shelfId
@@ -83,7 +84,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.id = :id
@@ -92,7 +93,7 @@ interface PendingItemDao {
 
     @Query("""
         SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
-               p.shelfId, p.quantity, p.createdAt, p.isDone
+               p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
         WHERE p.articleId = :articleId AND p.shelfId = :shelfId AND p.isDone = 0

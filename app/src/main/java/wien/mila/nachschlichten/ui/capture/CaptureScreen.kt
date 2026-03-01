@@ -56,6 +56,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.launch
 import wien.mila.nachschlichten.R
+import wien.mila.nachschlichten.ui.common.PendingItemInfoCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -235,37 +236,15 @@ fun CaptureScreen(
                                     }
                                 }
                             ) {
-                                Card(
+                                PendingItemInfoCard(
+                                    articleName = item.articleName,
+                                    subtitle = item.articleEan,
+                                    imagePath = item.imagePath,
+                                    quantity = item.quantity,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { onNavigateToArticleCheck(item.articleEan, viewModel.shelfId) },
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = item.articleName,
-                                                style = MaterialTheme.typography.bodyLarge
-                                            )
-                                            Text(
-                                                text = item.articleEan,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                        if (item.quantity != null) {
-                                            Text(
-                                                text = "×${item.quantity}",
-                                                style = MaterialTheme.typography.titleMedium
-                                            )
-                                        }
-                                    }
-                                }
+                                        .clickable { onNavigateToArticleCheck(item.articleEan, viewModel.shelfId) }
+                                )
                             }
                         }
                     }

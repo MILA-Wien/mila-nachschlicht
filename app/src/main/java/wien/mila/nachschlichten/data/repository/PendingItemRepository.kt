@@ -70,6 +70,7 @@ class PendingItemRepository @Inject constructor(
         shelfId = shelfId,
         quantity = quantity,
         createdAt = createdAt,
-        isDone = isDone
+        isDone = isDone,
+        imagePath = imagePath
     )
 }

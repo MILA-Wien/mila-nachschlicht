@@ -38,6 +38,7 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
+import wien.mila.nachschlichten.ui.common.PendingItemInfoCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,33 +140,15 @@ fun RetrieveItemListScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(pending, key = { it.id }) { item ->
-                        Card(modifier = Modifier.fillMaxWidth().clickable { onNavigateToItem(item.id) }) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = item.articleName,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "Regal: ${item.shelfId}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                if (item.quantity != null) {
-                                    Text(
-                                        text = "×${item.quantity}",
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                }
-                            }
-                        }
+                        PendingItemInfoCard(
+                            articleName = item.articleName,
+                            subtitle = "Regal: ${item.shelfId}",
+                            imagePath = item.imagePath,
+                            quantity = item.quantity,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToItem(item.id) }
+                        )
                     }
                     if (done.isNotEmpty()) {
                         items(done, key = { it.id }) { item ->
