@@ -93,6 +93,26 @@
     <string name="scan_unknown_zone_title">Zone not found</string>
     <string name="scan_unknown_zone">Unknown zone: %s</string>
 
+    <!-- Transfer (Export / Import) -->
+    <string name="transfer_section_title">Transfer app data</string>
+    <string name="transfer_group_api_settings">API settings (without password)</string>
+    <string name="transfer_group_api_password">API password</string>
+    <string name="transfer_group_zones_shelves">Storage zones &amp; shelves</string>
+    <string name="transfer_group_article_images">Article photos</string>
+    <string name="transfer_group_pending_items">Pending items</string>
+    <string name="transfer_export_button">Export</string>
+    <string name="transfer_import_button">Import</string>
+    <string name="transfer_import_dialog_title">Import</string>
+    <string name="transfer_import_confirm">Import</string>
+    <string name="transfer_import_zones_shelves_summary">%1$d zones, %2$d shelves</string>
+    <string name="transfer_import_article_images_summary">%d article photos</string>
+    <string name="transfer_import_pending_items_summary">%d pending items</string>
+    <string name="transfer_error_parse">Could not read file.</string>
+    <string name="transfer_error_version">Unsupported version: %d</string>
+    <string name="transfer_export_success">Export successful.</string>
+    <string name="transfer_import_success">Import successful.</string>
+    <string name="transfer_import_success_skipped">Import successful. %d items skipped (shelf/article not found).</string>
+
     <!-- Common -->
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>

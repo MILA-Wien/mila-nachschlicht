@@ -19,4 +19,7 @@ interface StorageZoneDao {
 
     @Query("DELETE FROM storage_zones WHERE id = :id")
     suspend fun delete(id: String)
+
+    @Query("SELECT * FROM storage_zones ORDER BY id")
+    suspend fun getAllOnce(): List<StorageZoneEntity>
 }

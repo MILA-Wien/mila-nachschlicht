@@ -1,5 +1,7 @@
 package wien.mila.nachschlichten.ui.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,10 +26,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -45,19 +51,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
+import wien.mila.nachschlichten.data.transfer.TransferOptions
 import wien.mila.nachschlichten.ui.common.SyncIndicator
 
 @Composable
 fun SettingsScreen(
     onNavigateToShelfEdit: (shelfId: String?) -> Unit,
     onNavigateToZoneEdit: (zoneId: String?) -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    transferVm: TransferViewModel = hiltViewModel()
 ) {
     // Local state for text fields — avoids cursor-jump caused by async DataStore round-trip
     var apiUrl by rememberSaveable { mutableStateOf("") }
@@ -79,6 +88,29 @@ fun SettingsScreen(
     val zones by viewModel.zones.collectAsStateWithLifecycle()
     val language by viewModel.language.collectAsStateWithLifecycle()
     var showResetDialog by remember { mutableStateOf(false) }
+
+    val transferUiState by transferVm.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) transferVm.onExportUriSelected(uri, context)
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) transferVm.onImportUriSelected(uri, context)
+    }
+
+    LaunchedEffect(Unit) {
+        transferVm.sideEffects.collect { effect ->
+            when (effect) {
+                is TransferSideEffect.LaunchExportFilePicker -> exportLauncher.launch(effect.suggestedName)
+                is TransferSideEffect.LaunchImportFilePicker -> importLauncher.launch(arrayOf("application/json", "*/*"))
+            }
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Heading row — surface background
@@ -274,6 +306,90 @@ fun SettingsScreen(
 
         HorizontalDivider()
 
+        // Transfer section
+        Text(
+            text = stringResource(R.string.transfer_section_title),
+            style = MaterialTheme.typography.titleMedium
+        )
+        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                TransferGroupCheckbox(
+                    label = stringResource(R.string.transfer_group_api_settings),
+                    checked = transferUiState.exportOptions.includeApiSettings,
+                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeApiSettings = it)) }
+                )
+                TransferGroupCheckbox(
+                    label = stringResource(R.string.transfer_group_api_password),
+                    checked = transferUiState.exportOptions.includeApiPassword,
+                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeApiPassword = it)) }
+                )
+                TransferGroupCheckbox(
+                    label = stringResource(R.string.transfer_group_zones_shelves),
+                    checked = transferUiState.exportOptions.includeZonesAndShelves,
+                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeZonesAndShelves = it)) }
+                )
+                TransferGroupCheckbox(
+                    label = stringResource(R.string.transfer_group_article_images),
+                    checked = transferUiState.exportOptions.includeArticleImages,
+                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includeArticleImages = it)) }
+                )
+                TransferGroupCheckbox(
+                    label = stringResource(R.string.transfer_group_pending_items),
+                    checked = transferUiState.exportOptions.includePendingItems,
+                    onCheckedChange = { transferVm.setExportOptions(transferUiState.exportOptions.copy(includePendingItems = it)) }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { transferVm.requestExport() },
+                        enabled = !transferUiState.isWorking,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        if (transferUiState.isWorking) {
+                            CircularProgressIndicator(modifier = Modifier.width(18.dp).height(18.dp), strokeWidth = 2.dp)
+                        } else {
+                            Text(stringResource(R.string.transfer_export_button))
+                        }
+                    }
+                    OutlinedButton(
+                        onClick = { transferVm.requestImport() },
+                        enabled = !transferUiState.isWorking,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.transfer_import_button))
+                    }
+                }
+                transferUiState.errorMessage?.let { msg ->
+                    val text = when {
+                        msg == "parse_error" -> stringResource(R.string.transfer_error_parse)
+                        msg.startsWith("version_mismatch:") -> {
+                            val v = msg.removePrefix("version_mismatch:").toIntOrNull() ?: 0
+                            stringResource(R.string.transfer_error_version, v)
+                        }
+                        else -> msg
+                    }
+                    Text(text = text, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                }
+                transferUiState.successMessage?.let { msg ->
+                    val text = when {
+                        msg == "export_success" -> stringResource(R.string.transfer_export_success)
+                        msg.startsWith("import_success:") -> {
+                            val skipped = msg.removePrefix("import_success:").toIntOrNull() ?: 0
+                            if (skipped == 0) stringResource(R.string.transfer_import_success)
+                            else stringResource(R.string.transfer_import_success_skipped, skipped)
+                        }
+                        else -> msg
+                    }
+                    Text(text = text, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+
+        HorizontalDivider()
+
         // Danger zone
         Text(
             text = stringResource(R.string.settings_danger_zone),
@@ -312,6 +428,100 @@ fun SettingsScreen(
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    val importFile = transferUiState.pendingImportFile
+    if (importFile != null) {
+        val importOpts = transferUiState.importOptions
+        AlertDialog(
+            onDismissRequest = { transferVm.onImportCancelled() },
+            title = { Text(stringResource(R.string.transfer_import_dialog_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TransferGroupCheckbox(
+                        label = stringResource(R.string.transfer_group_api_settings),
+                        checked = importOpts.includeApiSettings,
+                        enabled = importFile.apiSettings != null,
+                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeApiSettings = it)) }
+                    )
+                    TransferGroupCheckbox(
+                        label = stringResource(R.string.transfer_group_api_password),
+                        checked = importOpts.includeApiPassword,
+                        enabled = importFile.apiPassword != null,
+                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeApiPassword = it)) }
+                    )
+                    val zonesCount = importFile.zones?.size ?: 0
+                    val shelvesCount = importFile.shelves?.size ?: 0
+                    val hasZonesShelves = importFile.zones != null || importFile.shelves != null
+                    TransferGroupCheckbox(
+                        label = if (hasZonesShelves)
+                            stringResource(R.string.transfer_group_zones_shelves) + " (" +
+                            stringResource(R.string.transfer_import_zones_shelves_summary, zonesCount, shelvesCount) + ")"
+                        else stringResource(R.string.transfer_group_zones_shelves),
+                        checked = importOpts.includeZonesAndShelves,
+                        enabled = hasZonesShelves,
+                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeZonesAndShelves = it)) }
+                    )
+                    val imagesCount = importFile.articleImages?.size ?: 0
+                    TransferGroupCheckbox(
+                        label = if (importFile.articleImages != null)
+                            stringResource(R.string.transfer_group_article_images) + " (" +
+                            stringResource(R.string.transfer_import_article_images_summary, imagesCount) + ")"
+                        else stringResource(R.string.transfer_group_article_images),
+                        checked = importOpts.includeArticleImages,
+                        enabled = importFile.articleImages != null,
+                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeArticleImages = it)) }
+                    )
+                    val pendingCount = importFile.pendingItems?.size ?: 0
+                    TransferGroupCheckbox(
+                        label = if (importFile.pendingItems != null)
+                            stringResource(R.string.transfer_group_pending_items) + " (" +
+                            stringResource(R.string.transfer_import_pending_items_summary, pendingCount) + ")"
+                        else stringResource(R.string.transfer_group_pending_items),
+                        checked = importOpts.includePendingItems,
+                        enabled = importFile.pendingItems != null,
+                        onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includePendingItems = it)) }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { transferVm.onImportOptionsConfirmed() }) {
+                    Text(stringResource(R.string.transfer_import_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { transferVm.onImportCancelled() }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun TransferGroupCheckbox(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled) { onCheckedChange(!checked) }
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            enabled = enabled
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (enabled) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
         )
     }
 }

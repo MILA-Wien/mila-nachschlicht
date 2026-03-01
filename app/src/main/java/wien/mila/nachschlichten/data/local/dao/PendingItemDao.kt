@@ -2,6 +2,7 @@ package wien.mila.nachschlichten.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import wien.mila.nachschlichten.data.local.entity.PendingItemEntity
@@ -109,4 +110,10 @@ interface PendingItemDao {
 
     @Query("DELETE FROM pending_items WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM pending_items")
+    suspend fun getAllEntities(): List<PendingItemEntity>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertIgnoreConflict(item: PendingItemEntity): Long
 }
