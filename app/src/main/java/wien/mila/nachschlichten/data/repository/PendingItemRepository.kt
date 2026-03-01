@@ -44,6 +44,8 @@ class PendingItemRepository @Inject constructor(
         pendingItemDao.markDone(id)
     }
 
+    suspend fun unmarkDone(id: Long) = pendingItemDao.unmarkDone(id)
+
     suspend fun deleteAllPendingForShelf(shelfId: String) {
         pendingItemDao.deleteAllPendingForShelf(shelfId)
     }

@@ -43,6 +43,8 @@
     <string name="retrieve_no_pending">All items done!</string>
     <string name="retrieve_scan_result_title">Scanned article</string>
     <string name="retrieve_item_not_in_list">Article not in list</string>
+    <string name="retrieve_item_marked_done">Marked as done</string>
+    <string name="retrieve_item_marked_pending">Marked as pending</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>

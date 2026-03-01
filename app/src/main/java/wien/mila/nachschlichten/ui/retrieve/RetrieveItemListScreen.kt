@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.retrieve
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,21 +24,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.ui.common.PendingItemInfoCard
 
@@ -65,7 +79,12 @@ fun RetrieveItemListScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(zone?.reprString ?: stringResource(R.string.retrieve_items_title)) },
@@ -140,43 +159,121 @@ fun RetrieveItemListScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(pending, key = { it.id }) { item ->
-                        PendingItemInfoCard(
-                            articleName = item.articleName,
-                            subtitle = "Regal: ${item.shelfId}",
-                            imagePath = item.imagePath,
-                            quantity = item.quantity,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigateToItem(item.id) }
-                        )
-                    }
-                    if (done.isNotEmpty()) {
-                        items(done, key = { it.id }) { item ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                                )
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = item.articleName,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        textDecoration = TextDecoration.LineThrough,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.weight(1f)
+                        val dismissState = rememberSwipeToDismissBoxState()
+                        LaunchedEffect(dismissState.currentValue) {
+                            if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                viewModel.markDone(item.id)
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = context.getString(R.string.retrieve_item_marked_done),
+                                        actionLabel = context.getString(R.string.undo),
+                                        duration = SnackbarDuration.Short
                                     )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.unmarkDone(item.id)
+                                    }
+                                }
+                            }
+                        }
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            modifier = Modifier.clip(CardDefaults.shape),
+                            backgroundContent = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                                        .padding(horizontal = 24.dp),
+                                    contentAlignment = when (dismissState.targetValue) {
+                                        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                        else -> Alignment.CenterEnd
+                                    }
+                                ) {
                                     Icon(
                                         Icons.Default.CheckCircle,
                                         contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.secondary
+                                        tint = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
+                                }
+                            }
+                        ) {
+                            PendingItemInfoCard(
+                                articleName = item.articleName,
+                                subtitle = "Regal: ${item.shelfId}",
+                                imagePath = item.imagePath,
+                                quantity = item.quantity,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onNavigateToItem(item.id) }
+                            )
+                        }
+                    }
+                    if (done.isNotEmpty()) {
+                        items(done, key = { it.id }) { item ->
+                            val dismissState = rememberSwipeToDismissBoxState()
+                            LaunchedEffect(dismissState.currentValue) {
+                                if (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                                    viewModel.unmarkDone(item.id)
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = context.getString(R.string.retrieve_item_marked_pending),
+                                            actionLabel = context.getString(R.string.undo),
+                                            duration = SnackbarDuration.Short
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            viewModel.markDone(item.id)
+                                        }
+                                    }
+                                }
+                            }
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                modifier = Modifier.clip(CardDefaults.shape),
+                                backgroundContent = {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                            .padding(horizontal = 24.dp),
+                                        contentAlignment = when (dismissState.targetValue) {
+                                            SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                            else -> Alignment.CenterEnd
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.Undo,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onTertiaryContainer
+                                        )
+                                    }
+                                }
+                            ) {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    )
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = item.articleName,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            textDecoration = TextDecoration.LineThrough,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -76,6 +76,9 @@ interface PendingItemDao {
     @Query("UPDATE pending_items SET isDone = 1 WHERE id = :id")
     suspend fun markDone(id: Long)
 
+    @Query("UPDATE pending_items SET isDone = 0 WHERE id = :id")
+    suspend fun unmarkDone(id: Long)
+
     @Query("DELETE FROM pending_items WHERE shelfId = :shelfId AND isDone = 0")
     suspend fun deleteAllPendingForShelf(shelfId: String)
 

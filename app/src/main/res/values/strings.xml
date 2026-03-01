@@ -43,6 +43,8 @@
     <string name="retrieve_no_pending">Alle Artikel erledigt!</string>
     <string name="retrieve_scan_result_title">Gescannter Artikel</string>
     <string name="retrieve_item_not_in_list">Artikel nicht in der Liste</string>
+    <string name="retrieve_item_marked_done">Als erledigt markiert</string>
+    <string name="retrieve_item_marked_pending">Als offen markiert</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Einstellungen</string>
