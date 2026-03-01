@@ -25,6 +25,7 @@ import wien.mila.nachschlichten.ui.capture.CaptureShelfListScreen
 import wien.mila.nachschlichten.ui.capture.CaptureShelfListViewModel
 import wien.mila.nachschlichten.ui.capture.CaptureViewModel
 import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
+import wien.mila.nachschlichten.ui.retrieve.RetrieveItemCheckScreen
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListScreen
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListViewModel
 import wien.mila.nachschlichten.ui.retrieve.RetrieveScreen
@@ -43,14 +44,14 @@ fun NachschlichtenNavHost(
 
     LaunchedEffect(Unit) {
         globalNavVm.navigateToCapture.collect { shelfId ->
-            navController.navigate("capture_items/$shelfId") {
+            navController.navigate("capture/$shelfId") {
                 popUpTo(navController.graph.startDestinationId) { inclusive = false }
             }
         }
     }
     LaunchedEffect(Unit) {
         globalNavVm.navigateToRetrieve.collect { zoneId ->
-            navController.navigate("retrieve_items/$zoneId") {
+            navController.navigate("retrieve/$zoneId") {
                 popUpTo(navController.graph.startDestinationId) { inclusive = false }
             }
         }
@@ -67,11 +68,11 @@ fun NachschlichtenNavHost(
         currentRoute != AppDestination.CAPTURE.route
     ) {
         AlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = { globalUnknownShelfId = null },
             title = { Text(stringResource(R.string.scan_unknown_shelf_title)) },
             text = { Text(stringResource(R.string.scan_unknown_shelf, globalUnknownShelfId!!)) },
             confirmButton = {
-                TextButton(onClick = { }) {
+                TextButton(onClick = { globalUnknownShelfId = null }) {
                     Text(stringResource(R.string.confirm))
                 }
             }
@@ -81,11 +82,11 @@ fun NachschlichtenNavHost(
         currentRoute != AppDestination.RETRIEVE.route
     ) {
         AlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = { globalUnknownZoneId = null },
             title = { Text(stringResource(R.string.scan_unknown_zone_title)) },
             text = { Text(stringResource(R.string.scan_unknown_zone, globalUnknownZoneId!!)) },
             confirmButton = {
-                TextButton(onClick = { }) {
+                TextButton(onClick = { globalUnknownZoneId = null }) {
                     Text(stringResource(R.string.confirm))
                 }
             }
@@ -106,14 +107,14 @@ fun NachschlichtenNavHost(
             }
             CaptureShelfListScreen(
                 onNavigateToItems = { shelfId ->
-                    navController.navigate("capture_items/$shelfId")
+                    navController.navigate("capture/$shelfId")
                 },
                 viewModel = viewModel
             )
         }
 
         composable(
-            route = "capture_items/{shelfId}",
+            route = "capture/{shelfId}",
             arguments = listOf(navArgument("shelfId") { type = NavType.StringType })
         ) {
             val viewModel: CaptureViewModel = hiltViewModel()
@@ -126,25 +127,25 @@ fun NachschlichtenNavHost(
             CaptureScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToArticleCheck = { ean, shelfId ->
-                    navController.navigate("article_check/$ean/$shelfId")
+                    navController.navigate("capture/$shelfId/$ean")
                 },
                 viewModel = viewModel
             )
         }
 
         composable(
-            route = "article_check/{ean}/{shelfId}",
+            route = "capture/{shelfId}/{ean}",
             arguments = listOf(
-                navArgument("ean") { type = NavType.StringType },
-                navArgument("shelfId") { type = NavType.StringType }
+                navArgument("shelfId") { type = NavType.StringType },
+                navArgument("ean") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val shelfId = backStackEntry.arguments?.getString("shelfId") ?: ""
             LaunchedEffect(Unit) {
                 barcodeInputHandler.barcodeFlow.collect { barcode ->
                     if (!barcode.startsWith("shelf:") && !barcode.startsWith("zone:")) {
-                        navController.navigate("article_check/$barcode/$shelfId") {
-                            popUpTo("article_check/{ean}/{shelfId}") { inclusive = true }
+                        navController.navigate("capture/$shelfId/$barcode") {
+                            popUpTo("capture/{shelfId}/{ean}") { inclusive = true }
                         }
                     }
                 }
@@ -163,18 +164,19 @@ fun NachschlichtenNavHost(
             }
             RetrieveScreen(
                 onNavigateToItems = { zoneId ->
-                    navController.navigate("retrieve_items/$zoneId")
+                    navController.navigate("retrieve/$zoneId")
                 },
                 viewModel = viewModel
             )
         }
 
         composable(
-            route = "retrieve_items/{zoneId}",
+            route = "retrieve/{zoneId}",
             arguments = listOf(
                 navArgument("zoneId") { type = NavType.StringType }
             )
-        ) {
+        ) { backStackEntry ->
+            val zoneId = backStackEntry.arguments?.getString("zoneId") ?: ""
             val viewModel: RetrieveItemListViewModel = hiltViewModel()
             LaunchedEffect(Unit) {
                 barcodeInputHandler.barcodeFlow.collect { barcode ->
@@ -184,7 +186,22 @@ fun NachschlichtenNavHost(
             }
             RetrieveItemListScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onNavigateToItem = { pendingItemId ->
+                    navController.navigate("retrieve/$zoneId/$pendingItemId")
+                },
                 viewModel = viewModel
+            )
+        }
+
+        composable(
+            route = "retrieve/{zoneId}/{pendingItemId}",
+            arguments = listOf(
+                navArgument("zoneId") { type = NavType.StringType },
+                navArgument("pendingItemId") { type = NavType.LongType }
+            )
+        ) {
+            RetrieveItemCheckScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

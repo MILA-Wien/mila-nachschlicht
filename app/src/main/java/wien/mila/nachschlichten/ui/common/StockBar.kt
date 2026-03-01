@@ -10,6 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import wien.mila.nachschlichten.R
 
@@ -19,13 +23,19 @@ fun StockBar(
     unit: String,
     modifier: Modifier = Modifier
 ) {
-    val maxStock = 100
+    val maxStock = 20
     val progress = (totalStock.toFloat() / maxStock).coerceIn(0f, 1f)
     val stockDisplay = if (totalStock % 1.0 == 0.0) totalStock.toInt().toString() else totalStock.toString()
 
     Column(modifier = modifier) {
         Text(
-            text = "${stringResource(R.string.article_check_stock)}: $stockDisplay $unit",
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("$stockDisplay $unit")
+                }
+                append(" ")
+                append(stringResource(R.string.article_check_stock))
+            },
             style = MaterialTheme.typography.bodyLarge
         )
         Spacer(modifier = Modifier.height(4.dp))

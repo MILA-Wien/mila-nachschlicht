@@ -16,7 +16,6 @@ import javax.inject.Inject
 data class ArticleCheckUiState(
     val article: Article? = null,
     val isLoading: Boolean = true,
-    val notFound: Boolean = false,
     val quantity: Int? = null,
     val saved: Boolean = false
 )
@@ -44,7 +43,7 @@ class ArticleCheckViewModel @Inject constructor(
             _uiState.value = if (article != null) {
                 ArticleCheckUiState(article = article, isLoading = false)
             } else {
-                ArticleCheckUiState(isLoading = false, notFound = true)
+                ArticleCheckUiState(isLoading = false, saved = true)
             }
         }
     }
@@ -78,6 +77,17 @@ class ArticleCheckViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 article = article.copy(imagePath = path)
             )
+        }
+    }
+
+    fun fetchImageIfNeeded() {
+        val article = _uiState.value.article ?: return
+        if (article.imagePath != null) return
+        viewModelScope.launch {
+            val url = articleRepository.fetchAndSaveImageFromOpenFoodFacts(article.ean, article.id)
+            if (url != null) {
+                _uiState.value = _uiState.value.copy(article = article.copy(imagePath = url))
+            }
         }
     }
 }
