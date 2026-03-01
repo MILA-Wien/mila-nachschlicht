@@ -17,7 +17,8 @@ data class ArticleCheckUiState(
     val article: Article? = null,
     val isLoading: Boolean = true,
     val quantity: Int? = null,
-    val saved: Boolean = false
+    val saved: Boolean = false,
+    val existingPendingItemId: Long? = null
 )
 
 @HiltViewModel
@@ -40,10 +41,16 @@ class ArticleCheckViewModel @Inject constructor(
     private fun loadArticle() {
         viewModelScope.launch {
             val article = articleRepository.getByEan(ean)
-            _uiState.value = if (article != null) {
-                ArticleCheckUiState(article = article, isLoading = false)
+            if (article != null) {
+                val existing = pendingItemRepository.getByArticleAndShelf(article.id, shelfId)
+                _uiState.value = ArticleCheckUiState(
+                    article = article,
+                    isLoading = false,
+                    quantity = existing?.quantity,
+                    existingPendingItemId = existing?.id
+                )
             } else {
-                ArticleCheckUiState(isLoading = false, saved = true)
+                _uiState.value = ArticleCheckUiState(isLoading = false, saved = true)
             }
         }
     }
@@ -61,11 +68,16 @@ class ArticleCheckViewModel @Inject constructor(
     fun markForRestock() {
         val article = _uiState.value.article ?: return
         viewModelScope.launch {
-            pendingItemRepository.insert(
-                articleId = article.id,
-                shelfId = shelfId,
-                quantity = _uiState.value.quantity
-            )
+            val existingId = _uiState.value.existingPendingItemId
+            if (existingId != null) {
+                pendingItemRepository.updateQuantity(existingId, _uiState.value.quantity)
+            } else {
+                pendingItemRepository.insert(
+                    articleId = article.id,
+                    shelfId = shelfId,
+                    quantity = _uiState.value.quantity
+                )
+            }
             _uiState.value = _uiState.value.copy(saved = true)
         }
     }

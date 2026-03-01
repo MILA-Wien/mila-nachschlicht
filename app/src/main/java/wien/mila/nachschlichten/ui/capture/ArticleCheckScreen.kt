@@ -197,14 +197,6 @@ fun ArticleCheckScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            OutlinedButton(
-                                onClick = onNavigateBack,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(56.dp)
-                            ) {
-                                Text(stringResource(R.string.article_check_skip))
-                            }
                             Button(
                                 onClick = viewModel::markForRestock,
                                 modifier = Modifier

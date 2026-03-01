@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.retrieve
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -138,7 +139,7 @@ fun RetrieveItemListScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(pending, key = { it.id }) { item ->
-                        Card(modifier = Modifier.fillMaxWidth()) {
+                        Card(modifier = Modifier.fillMaxWidth().clickable { onNavigateToItem(item.id) }) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()

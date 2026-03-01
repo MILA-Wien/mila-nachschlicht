@@ -54,6 +54,14 @@ class PendingItemRepository @Inject constructor(
 
     suspend fun getById(id: Long): PendingItem? = pendingItemDao.getById(id)?.toModel()
 
+    suspend fun getByArticleAndShelf(articleId: Long, shelfId: String): PendingItem? =
+        pendingItemDao.getByArticleAndShelf(articleId, shelfId)?.toModel()
+
+    suspend fun updateQuantity(id: Long, quantity: Int?) =
+        pendingItemDao.updateQuantity(id, quantity)
+
+    suspend fun deleteById(id: Long) = pendingItemDao.deleteById(id)
+
     private fun PendingItemWithArticle.toModel() = PendingItem(
         id = id,
         articleId = articleId,

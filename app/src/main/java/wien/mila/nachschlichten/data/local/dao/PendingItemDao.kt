@@ -89,4 +89,20 @@ interface PendingItemDao {
         WHERE p.id = :id
     """)
     suspend fun getById(id: Long): PendingItemWithArticle?
+
+    @Query("""
+        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+               p.shelfId, p.quantity, p.createdAt, p.isDone
+        FROM pending_items p
+        INNER JOIN articles a ON a.id = p.articleId
+        WHERE p.articleId = :articleId AND p.shelfId = :shelfId AND p.isDone = 0
+        LIMIT 1
+    """)
+    suspend fun getByArticleAndShelf(articleId: Long, shelfId: String): PendingItemWithArticle?
+
+    @Query("UPDATE pending_items SET quantity = :quantity WHERE id = :id")
+    suspend fun updateQuantity(id: Long, quantity: Int?)
+
+    @Query("DELETE FROM pending_items WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }

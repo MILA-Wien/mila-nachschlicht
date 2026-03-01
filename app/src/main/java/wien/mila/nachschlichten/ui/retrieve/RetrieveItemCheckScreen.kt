@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -137,7 +139,7 @@ fun RetrieveItemCheckScreen(
                     } ?: Text(pendingItem.articleName, style = MaterialTheme.typography.headlineSmall)
 
                     Text(
-                        text = "Regal: ${pendingItem.shelfId}",
+                        text = "${stringResource(R.string.retrieve_for_shelf)}: ${pendingItem.shelfId}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     if (pendingItem.quantity != null) {
@@ -155,6 +157,8 @@ fun RetrieveItemCheckScreen(
                             .fillMaxWidth()
                             .height(56.dp)
                     ) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.retrieve_mark_done))
                     }
                 }
