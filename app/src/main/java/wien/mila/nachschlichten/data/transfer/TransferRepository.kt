@@ -90,6 +90,21 @@ class TransferRepository @Inject constructor(
             file.shelves?.forEach { shelf ->
                 shelfDao.upsert(ShelfEntity(shelf.id, shelf.description, shelf.storageZoneId))
             }
+
+            if (options.deleteAbsentZonesAndShelves) {
+                val importShelfIds = file.shelves?.map { it.id }?.toSet() ?: emptySet()
+                shelfDao.getAllOnce()
+                    .filter { it.id !in importShelfIds }
+                    .forEach { shelf ->
+                        pendingItemDao.deleteAllItemsForShelf(shelf.id)
+                        shelfDao.delete(shelf.id)
+                    }
+
+                val importZoneIds = file.zones?.map { it.id }?.toSet() ?: emptySet()
+                storageZoneDao.getAllOnce()
+                    .filter { it.id !in importZoneIds }
+                    .forEach { zone -> storageZoneDao.delete(zone.id) }
+            }
         }
 
         if (options.includeArticleImages && file.articleImages != null) {

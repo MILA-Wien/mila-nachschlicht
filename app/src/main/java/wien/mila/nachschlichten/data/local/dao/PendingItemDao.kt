@@ -94,6 +94,9 @@ interface PendingItemDao {
     @Query("DELETE FROM pending_items WHERE shelfId = :shelfId AND isDone = 0")
     suspend fun deleteAllPendingForShelf(shelfId: String)
 
+    @Query("DELETE FROM pending_items WHERE shelfId = :shelfId")
+    suspend fun deleteAllItemsForShelf(shelfId: String)
+
     @Query("DELETE FROM pending_items")
     suspend fun deleteAllPending()
 

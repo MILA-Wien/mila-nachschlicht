@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.Locale
 import wien.mila.nachschlichten.data.datastore.UserPreferences
 import wien.mila.nachschlichten.data.repository.ArticleRepository
 import wien.mila.nachschlichten.data.repository.PendingItemRepository
@@ -47,8 +48,17 @@ class SettingsViewModel @Inject constructor(
     val lastSyncedAt: StateFlow<Long?> = userPreferences.lastSyncedAt
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    val language: StateFlow<String> = userPreferences.language
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "de")
+    private fun resolveCurrentLanguage(): String {
+        val appLocales = AppCompatDelegate.getApplicationLocales()
+        return if (appLocales.isEmpty) {
+            if (Locale.getDefault().language == "en") "en" else "de"
+        } else {
+            appLocales.get(0)?.language?.let { if (it == "en") "en" else "de" } ?: "de"
+        }
+    }
+
+    private val _language = MutableStateFlow(resolveCurrentLanguage())
+    val language: StateFlow<String> = _language.asStateFlow()
 
     val articleCount: StateFlow<Int> = articleRepository.countAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
@@ -136,6 +146,7 @@ class SettingsViewModel @Inject constructor(
             userPreferences.setLanguage(lang)
             val localeList = LocaleListCompat.forLanguageTags(lang)
             AppCompatDelegate.setApplicationLocales(localeList)
+            _language.value = lang
         }
     }
 

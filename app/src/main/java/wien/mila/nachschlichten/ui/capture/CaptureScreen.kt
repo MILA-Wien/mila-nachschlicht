@@ -48,6 +48,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -102,18 +104,24 @@ fun CaptureScreen(
                 actions = {
                     if (shelf != null) {
                         Column(
-                            modifier = Modifier.padding(end = 16.dp),
+                            modifier = Modifier
+                                .widthIn(max = 200.dp)
+                                .padding(end = 16.dp),
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
                                 text = shelf!!.id,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = shelf!!.description,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -127,8 +135,6 @@ fun CaptureScreen(
                 .padding(scaffoldPadding)
                 .padding(16.dp)
         ) {
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 // Scan hint / unknown EAN feedback
                 if (unknownEan != null) {

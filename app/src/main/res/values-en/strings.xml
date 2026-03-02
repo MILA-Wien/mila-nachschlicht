@@ -7,7 +7,7 @@
     <string name="nav_settings">Settings</string>
 
     <!-- Capture Screen -->
-    <string name="capture_title">Capture restock items</string>
+    <string name="capture_title">Capture</string>
     <string name="capture_select_shelf">Select or scan shelf</string>
     <string name="capture_no_shelves">No shelves configured yet</string>
     <string name="capture_scan_hint">Scan article</string>
@@ -18,7 +18,7 @@
     <string name="capture_unknown_ean">Unknown EAN: %s</string>
 
     <!-- Article Check Screen -->
-    <string name="article_check_title">Mark article for restock</string>
+    <string name="article_check_title">Mark for restock</string>
     <string name="article_check_mark_restock">Mark for restock</string>
     <string name="article_check_mark_restock_qty">Mark %d for restock</string>
     <string name="article_check_skip">Skip</string>
@@ -37,6 +37,7 @@
     <string name="retrieve_progress">%1$d / %2$d finished</string>
 
     <!-- Retrieve Item List Screen -->
+    <string name="retrieve_no_zone">Zone unknown</string>
     <string name="retrieve_items_title">Retrieve items</string>
     <string name="retrieve_scan_hint">Scan article to mark done</string>
     <string name="retrieve_mark_done">Mark done</string>
@@ -62,10 +63,11 @@
     <string name="settings_add_zone">Add storage zone</string>
     <string name="settings_language">Language</string>
     <string name="settings_danger_zone">Danger zone</string>
-    <string name="settings_reset_pending">Reset all pending items</string>
-    <string name="settings_reset_pending_confirm">Really delete all pending items? This cannot be undone.</string>
+    <string name="settings_reset_pending">Reset all restock markings</string>
+    <string name="settings_reset_pending_confirm">Really delete all items marked for restock? This cannot be undone.</string>
 
     <!-- Shelf Edit Screen -->
+    <string name="shelf_edit_no_zone">No storage zone</string>
     <string name="shelf_edit_title_new">New shelf</string>
     <string name="shelf_edit_title_edit">Edit shelf</string>
     <string name="shelf_edit_id">Shelf ID (e.g. A1)</string>
@@ -108,10 +110,19 @@
     <string name="transfer_import_article_images_summary">%d article photos</string>
     <string name="transfer_import_pending_items_summary">%d pending items</string>
     <string name="transfer_error_parse">Could not read file.</string>
+    <string name="transfer_error_zones_missing_field">%d zone(s) with missing mandatory fields – import deactivated</string>
     <string name="transfer_error_version">Unsupported version: %d</string>
     <string name="transfer_export_success">Export successful.</string>
     <string name="transfer_import_success">Import successful.</string>
     <string name="transfer_import_success_skipped">Import successful. %d items skipped (shelf/article not found).</string>
+    <string name="transfer_import_delete_absent_zones_shelves">Delete zones &amp; shelves not in file</string>
+
+    <!-- Technical Configuration -->
+    <string name="settings_technical_config">Technical Configuration</string>
+    <string name="settings_technical_config_hint">Administrators only</string>
+    <string name="settings_admin_warning_title">Administrators only</string>
+    <string name="settings_admin_warning_message">These settings must only be changed by administrators. Do you want to continue?</string>
+    <string name="settings_admin_warning_confirm">Continue</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
@@ -129,4 +140,7 @@
     <string name="capture_item_deleted">Item removed</string>
     <string name="undo">Undo</string>
     <string name="retrieve_for_shelf">For shelf</string>
+    <string name="api_settings_section_title">API</string>
+    <string name="settings_sync">Stock levels</string>
+    <string name="transfer_error_shelves_missing_field">%d shelves with missing mandatory fields – import deactivated</string>
 </resources>
