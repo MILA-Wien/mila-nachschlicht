@@ -1,5 +1,6 @@
 package wien.mila.nachschlichten.ui.retrieve
 
+import android.graphics.Typeface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -46,13 +48,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.launch
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.ui.common.PendingItemInfoCard
+import kotlin.collections.mapOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,13 +95,27 @@ fun RetrieveItemListScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(zone?.reprString ?: stringResource(R.string.retrieve_no_zone)) },
+                title = { Text(zone?.id ?: stringResource(R.string.retrieve_no_zone)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = zoneColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = zoneColor),
+                actions = {
+                    if (zone != null) {
+                        Text(
+                            text = zone!!.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .widthIn(max = 200.dp)
+                                .padding(end = 16.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             )
         }
     ) { padding ->
@@ -122,20 +144,19 @@ fun RetrieveItemListScreen(
                     }
                 }
             } else {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.retrieve_scan_hint),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec.RawRes(R.raw.product_scan)
+                )
+                val fontMap = remember {
+                    mapOf("Roboto-Black" to Typeface.create("sans-serif-black", Typeface.NORMAL))
                 }
+                LottieAnimation(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    fontMap = fontMap,
+                    modifier = Modifier
+                        .height(120.dp).align(Alignment.CenterHorizontally)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

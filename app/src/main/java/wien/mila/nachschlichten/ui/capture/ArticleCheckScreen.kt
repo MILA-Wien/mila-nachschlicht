@@ -51,6 +51,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import android.net.Uri
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.airbnb.lottie.compose.LottieAnimation
@@ -118,18 +120,24 @@ fun ArticleCheckScreen(
                     val shelf = uiState.shelf
                     if (shelf != null) {
                         Column(
-                            modifier = Modifier.padding(end = 16.dp),
+                            modifier = Modifier
+                                .widthIn(max = 200.dp)
+                                .padding(end = 16.dp),
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
                                 text = shelf.id,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = shelf.description,
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }

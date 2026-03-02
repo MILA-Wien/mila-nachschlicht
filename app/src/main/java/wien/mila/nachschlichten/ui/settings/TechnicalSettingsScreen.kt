@@ -262,8 +262,26 @@ fun TechnicalSettingsScreen(
                                 else stringResource(R.string.transfer_group_zones_shelves),
                                 checked = importOpts.includeZonesAndShelves,
                                 enabled = hasZonesShelves && zonesShelvesError == null,
-                                onCheckedChange = { transferVm.setImportOptions(importOpts.copy(includeZonesAndShelves = it)) }
+                                onCheckedChange = {
+                                    transferVm.setImportOptions(
+                                        importOpts.copy(
+                                            includeZonesAndShelves = it,
+                                            deleteAbsentZonesAndShelves = if (!it) false else importOpts.deleteAbsentZonesAndShelves
+                                        )
+                                    )
+                                }
                             )
+                            if (hasZonesShelves && zonesShelvesError == null) {
+                                TransferGroupCheckbox(
+                                    label = stringResource(R.string.transfer_import_delete_absent_zones_shelves),
+                                    checked = importOpts.deleteAbsentZonesAndShelves,
+                                    enabled = importOpts.includeZonesAndShelves,
+                                    onCheckedChange = {
+                                        transferVm.setImportOptions(importOpts.copy(deleteAbsentZonesAndShelves = it))
+                                    },
+                                    modifier = Modifier.padding(start = 24.dp)
+                                )
+                            }
                             zonesShelvesError?.let { errMsg ->
                                 val errText = when {
                                     errMsg.startsWith("shelves_missing_field:") -> {

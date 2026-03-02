@@ -117,6 +117,7 @@
     <string name="transfer_export_success">Export erfolgreich.</string>
     <string name="transfer_import_success">Import erfolgreich.</string>
     <string name="transfer_import_success_skipped">Import erfolgreich. %d Artikel übersprungen (Regal/Artikel nicht vorhanden).</string>
+    <string name="transfer_import_delete_absent_zones_shelves">Nicht enthaltene Zonen &amp; Regale löschen</string>
 
     <!-- Technical Configuration -->
     <string name="settings_technical_config">Technische Konfiguration</string>

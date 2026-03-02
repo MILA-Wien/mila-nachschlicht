@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -99,13 +101,27 @@ fun RetrieveItemCheckScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(uiState.zone?.reprString ?: stringResource(R.string.retrieve_items_title)) },
+                title = { Text(uiState.zone?.id ?: stringResource(R.string.retrieve_items_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = zoneColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = zoneColor),
+                actions = {
+                    if (uiState.zone != null) {
+                        Text(
+                            text = uiState.zone!!.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .widthIn(max = 200.dp)
+                                .padding(end = 16.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             )
         }
     ) { padding ->

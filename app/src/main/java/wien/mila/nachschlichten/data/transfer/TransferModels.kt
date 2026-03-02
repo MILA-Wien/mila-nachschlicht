@@ -14,7 +14,8 @@ data class TransferOptions(
     val includeApiSettings: Boolean = true,
     val includeZonesAndShelves: Boolean = true,
     val includeArticleImages: Boolean = true,
-    val includePendingItems: Boolean = false
+    val includePendingItems: Boolean = false,
+    val deleteAbsentZonesAndShelves: Boolean = false
 )
 
 data class TransferApiSettings(val apiUrl: String, val username: String)
