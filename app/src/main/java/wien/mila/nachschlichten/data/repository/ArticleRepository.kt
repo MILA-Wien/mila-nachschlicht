@@ -1,5 +1,7 @@
 package wien.mila.nachschlichten.data.repository
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -10,6 +12,7 @@ import wien.mila.nachschlichten.data.local.dao.ArticleDao
 import wien.mila.nachschlichten.data.local.entity.ArticleEntity
 import wien.mila.nachschlichten.data.remote.NachschlichtenApi
 import wien.mila.nachschlichten.domain.model.Article
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -18,7 +21,8 @@ import javax.inject.Singleton
 class ArticleRepository @Inject constructor(
     private val articleDao: ArticleDao,
     private val api: NachschlichtenApi,
-    @Named("plain") private val plainHttpClient: OkHttpClient
+    @Named("plain") private val plainHttpClient: OkHttpClient,
+    @param:ApplicationContext private val context: Context
 ) {
     fun countAll() = articleDao.countAll()
     fun countWithEan() = articleDao.countWithEan()
@@ -57,9 +61,29 @@ class ArticleRepository @Inject constructor(
         }
     }
 
+    private fun deleteLocalImageFile(imagePath: String?) {
+        if (imagePath == null || !imagePath.startsWith("content://")) return
+        val filename = imagePath.substringAfterLast("/")
+        File(context.filesDir, "article_images/$filename").delete()
+    }
+
     suspend fun updateImagePath(articleId: Long, imagePath: String) {
         val article = articleDao.getById(articleId) ?: return
+        deleteLocalImageFile(article.imagePath)
         articleDao.upsertAll(listOf(article.copy(imagePath = imagePath)))
+    }
+
+    suspend fun cleanupOrphanedImageFiles() {
+        val referencedFilenames = articleDao.getAllWithImagePath()
+            .mapNotNull { row ->
+                val path = row.imagePath ?: return@mapNotNull null
+                if (path.startsWith("content://")) path.substringAfterLast("/") else null
+            }
+            .toSet()
+        val imageDir = File(context.filesDir, "article_images")
+        imageDir.listFiles()?.forEach { file ->
+            if (file.name !in referencedFilenames) file.delete()
+        }
     }
 
     suspend fun fetchAndSaveImageFromOpenFoodFacts(ean: String, articleId: Long): String? {

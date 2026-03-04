@@ -39,6 +39,7 @@ class SyncWorker @AssistedInject constructor(
 
             val result = articleRepository.syncFromApi(url)
             if (result.isSuccess) {
+                articleRepository.cleanupOrphanedImageFiles()
                 userPreferences.setLastSyncedAt(System.currentTimeMillis())
                 Result.success()
             } else {

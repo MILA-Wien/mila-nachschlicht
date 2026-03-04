@@ -12,6 +12,7 @@ import wien.mila.nachschlichten.data.local.dao.StorageZoneDao
 import wien.mila.nachschlichten.data.local.entity.PendingItemEntity
 import wien.mila.nachschlichten.data.local.entity.ShelfEntity
 import wien.mila.nachschlichten.data.local.entity.StorageZoneEntity
+import wien.mila.nachschlichten.data.repository.ArticleRepository
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
@@ -24,7 +25,8 @@ class TransferRepository @Inject constructor(
     val storageZoneDao: StorageZoneDao,
     val shelfDao: ShelfDao,
     val articleDao: ArticleDao,
-    val pendingItemDao: PendingItemDao
+    val pendingItemDao: PendingItemDao,
+    val articleRepository: ArticleRepository
 ) {
     suspend fun buildExport(options: TransferOptions): TransferFile {
         val apiSettings = if (options.includeApiSettings) {
@@ -115,7 +117,7 @@ class TransferRepository @Inject constructor(
                 if (!articleExists) continue
                 when {
                     entry.imagePath != null -> {
-                        articleDao.updateImagePath(entry.articleId, entry.imagePath)
+                        articleRepository.updateImagePath(entry.articleId, entry.imagePath)
                     }
                     entry.imageData != null -> {
                         val bytes = Base64.decode(entry.imageData, Base64.NO_WRAP)
@@ -126,7 +128,7 @@ class TransferRepository @Inject constructor(
                             "${context.packageName}.fileprovider",
                             newFile
                         )
-                        articleDao.updateImagePath(entry.articleId, uri.toString())
+                        articleRepository.updateImagePath(entry.articleId, uri.toString())
                     }
                 }
             }
