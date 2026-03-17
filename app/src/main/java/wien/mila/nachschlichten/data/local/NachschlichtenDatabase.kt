@@ -47,7 +47,7 @@ abstract class NachschlichtenDatabase : RoomDatabase() {
                 """)
                 db.execSQL("CREATE INDEX IF NOT EXISTS `index_article_eans_articleId` ON `article_eans` (`articleId`)")
                 // Copy existing single EANs into the join table
-                db.execSQL("INSERT INTO `article_eans` (`ean`, `articleId`) SELECT `ean`, `id` FROM `articles` WHERE `ean` != ''")
+                db.execSQL("INSERT OR IGNORE INTO `article_eans` (`ean`, `articleId`) SELECT `ean`, `id` FROM `articles` WHERE `ean` != ''")
                 // Recreate articles without the ean column (ALTER TABLE DROP COLUMN not universally supported)
                 db.execSQL("""
                     CREATE TABLE `articles_new` (
