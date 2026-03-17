@@ -2,7 +2,7 @@ package wien.mila.nachschlichten.domain.model
 
 data class Article(
     val id: Long,
-    val ean: String,
+    val eans: List<String>,
     val name: String,
     val unit: String,
     val totalStock: Double,

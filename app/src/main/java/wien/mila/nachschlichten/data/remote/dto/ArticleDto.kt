@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class ArticleDto(
     @SerializedName("ID") val id: Long,
-    @SerializedName("barcode") val ean: String,
+    @SerializedName("barcodes") val eans: List<String>?,
     @SerializedName("name") val name: String,
     @SerializedName("kurzname") val shortName: String,
     @SerializedName("einheit") val unit: String?,

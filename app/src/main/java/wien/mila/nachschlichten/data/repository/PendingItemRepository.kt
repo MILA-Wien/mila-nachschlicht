@@ -69,7 +69,7 @@ class PendingItemRepository @Inject constructor(
         id = id,
         articleId = articleId,
         articleName = articleName,
-        articleEan = articleEan,
+        articleEans = articleEan.split(",").map { it.trim() }.filter { it.isNotEmpty() },
         shelfId = shelfId,
         quantity = quantity,
         createdAt = createdAt,
