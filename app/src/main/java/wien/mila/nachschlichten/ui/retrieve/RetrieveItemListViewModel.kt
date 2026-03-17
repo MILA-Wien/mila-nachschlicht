@@ -60,7 +60,7 @@ class RetrieveItemListViewModel @Inject constructor(
     fun onBarcodeScan(ean: String) {
         viewModelScope.launch {
             val items = pendingItems.value
-            val match = items.firstOrNull { it.articleEan == ean && !it.isDone }
+            val match = items.firstOrNull { ean in it.articleEans && !it.isDone }
             if (match != null) {
                 _navigateToCheck.emit(match.id)
             } else {

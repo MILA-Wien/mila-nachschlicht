@@ -8,6 +8,7 @@ import wien.mila.nachschlichten.data.local.dao.ArticleDao
 import wien.mila.nachschlichten.data.local.dao.PendingItemDao
 import wien.mila.nachschlichten.data.local.dao.ShelfDao
 import wien.mila.nachschlichten.data.local.dao.StorageZoneDao
+import wien.mila.nachschlichten.data.local.entity.ArticleEanEntity
 import wien.mila.nachschlichten.data.local.entity.ArticleEntity
 import wien.mila.nachschlichten.data.local.entity.PendingItemEntity
 import wien.mila.nachschlichten.data.local.entity.ShelfEntity
@@ -18,9 +19,10 @@ import wien.mila.nachschlichten.data.local.entity.StorageZoneEntity
         ShelfEntity::class,
         StorageZoneEntity::class,
         ArticleEntity::class,
+        ArticleEanEntity::class,
         PendingItemEntity::class
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [],
     exportSchema = true
 )
@@ -31,6 +33,40 @@ abstract class NachschlichtenDatabase : RoomDatabase() {
     abstract fun pendingItemDao(): PendingItemDao
 
     companion object {
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Create article_eans join table
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `article_eans` (
+                        `ean` TEXT NOT NULL,
+                        `articleId` INTEGER NOT NULL,
+                        PRIMARY KEY(`ean`),
+                        FOREIGN KEY(`articleId`) REFERENCES `articles`(`id`)
+                            ON UPDATE NO ACTION ON DELETE CASCADE
+                    )
+                """)
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_article_eans_articleId` ON `article_eans` (`articleId`)")
+                // Copy existing single EANs into the join table
+                db.execSQL("INSERT INTO `article_eans` (`ean`, `articleId`) SELECT `ean`, `id` FROM `articles` WHERE `ean` != ''")
+                // Recreate articles without the ean column (ALTER TABLE DROP COLUMN not universally supported)
+                db.execSQL("""
+                    CREATE TABLE `articles_new` (
+                        `id` INTEGER NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `unit` TEXT NOT NULL,
+                        `totalStock` REAL NOT NULL,
+                        `price` REAL NOT NULL,
+                        `lastSyncedAt` INTEGER NOT NULL,
+                        `imagePath` TEXT,
+                        PRIMARY KEY(`id`)
+                    )
+                """)
+                db.execSQL("INSERT INTO `articles_new` SELECT `id`, `name`, `unit`, `totalStock`, `price`, `lastSyncedAt`, `imagePath` FROM `articles`")
+                db.execSQL("DROP TABLE `articles`")
+                db.execSQL("ALTER TABLE `articles_new` RENAME TO `articles`")
+            }
+        }
+
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // SQLite can't ALTER COLUMN nullability; recreate shelves with storageZoneId nullable.
@@ -81,4 +117,3 @@ abstract class NachschlichtenDatabase : RoomDatabase() {
 
     }
 }
-
