@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import wien.mila.nachschlichten.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,6 +26,8 @@ import wien.mila.nachschlichten.ui.capture.CaptureShelfListScreen
 import wien.mila.nachschlichten.ui.capture.CaptureShelfListViewModel
 import wien.mila.nachschlichten.ui.capture.CaptureViewModel
 import wien.mila.nachschlichten.ui.common.BarcodeInputHandler
+import wien.mila.nachschlichten.ui.common.HelpScreen
+import wien.mila.nachschlichten.ui.common.HelpScreenKey
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemCheckScreen
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListScreen
 import wien.mila.nachschlichten.ui.retrieve.RetrieveItemListViewModel
@@ -42,6 +45,21 @@ fun NachschlichtenNavHost(
     modifier: Modifier = Modifier
 ) {
     val globalNavVm: GlobalNavigationViewModel = hiltViewModel()
+    val helpTitle by globalNavVm.helpTitle.collectAsStateWithLifecycle()
+    val helpText by globalNavVm.helpText.collectAsStateWithLifecycle()
+    val helpKey by globalNavVm.helpKey.collectAsStateWithLifecycle()
+    val helpImageAssetPath by globalNavVm.helpImageAssetPath.collectAsStateWithLifecycle()
+    val helpShowGuideButton by globalNavVm.helpShowGuideButton.collectAsStateWithLifecycle()
+    val welcomeHelpTitle = stringResource(R.string.help_welcome_title)
+    val welcomeHelpText = stringResource(R.string.help_welcome_text)
+    val openWelcomeHelp = {
+        globalNavVm.navigateToHelp(
+            title = welcomeHelpTitle,
+            text = welcomeHelpText,
+            helpKey = HelpScreenKey.WELCOME,
+            imageAssetPath = "Manuel_1.jpg"
+        )
+    }
 
     LaunchedEffect(Unit) {
         globalNavVm.navigateToCapture.collect { shelfId ->
@@ -55,6 +73,11 @@ fun NachschlichtenNavHost(
             navController.navigate("retrieve/$zoneId") {
                 popUpTo(navController.graph.startDestinationId) { inclusive = false }
             }
+        }
+    }
+    LaunchedEffect(Unit) {
+        globalNavVm.navigateToHelp.collect {
+            navController.navigate(AppDestination.HELP.route)
         }
     }
 
@@ -203,6 +226,19 @@ fun NachschlichtenNavHost(
         ) {
             RetrieveItemCheckScreen(
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(AppDestination.HELP.route) {
+            val showDefaultHelp = helpKey == HelpScreenKey.DEFAULT
+            HelpScreen(
+                title = if (showDefaultHelp) welcomeHelpTitle else helpTitle,
+                text = if (showDefaultHelp) welcomeHelpText else helpText,
+                helpKey = if (showDefaultHelp) HelpScreenKey.WELCOME else helpKey,
+                imageAssetPath = if (showDefaultHelp) "Manuel_1.jpg" else helpImageAssetPath,
+                topActionLabel = if (helpShowGuideButton) stringResource(R.string.help_welcome_title) else null,
+                onTopAction = if (helpShowGuideButton) openWelcomeHelp else null,
+                onDone = { navController.popBackStack() }
             )
         }
 

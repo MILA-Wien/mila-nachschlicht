@@ -17,6 +17,12 @@ val Pink            = Color(0xFFC7007F)   // Badges, "Alles löschen" action, bo
 val Yellow          = Color(0xFFFFDB00)   // Badge border, highlight rim on Pink elements
 val Purple          = Color(0xFF3B2776)   // Settings icons (Warengruppen), tertiary accent
 
+val MilaTurquoise = TealLight
+val MilaTurquoiseDark = TealDark
+val MilaYellow = Yellow
+val MilaPink = Pink
+val MilaPurple = Purple
+
 
 // ─────────────────────────────────────────────
 // Backgrounds & Surfaces

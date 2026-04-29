@@ -1,6 +1,7 @@
 package wien.mila.nachschlichten.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Settings
@@ -14,5 +15,6 @@ enum class AppDestination(
 ) {
     CAPTURE("capture", R.string.nav_capture, Icons.Default.QrCodeScanner),
     RETRIEVE("retrieve", R.string.nav_retrieve, Icons.Default.Inventory),
-    SETTINGS("settings", R.string.nav_settings, Icons.Default.Settings)
+    SETTINGS("settings", R.string.nav_settings, Icons.Default.Settings),
+    HELP("help", R.string.help_default_title, Icons.Default.Help)
 }
