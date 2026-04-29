@@ -30,6 +30,7 @@ fun NachschlichtenApp(barcodeInputHandler: BarcodeInputHandler) {
     val currentDestination: AppDestination = when {
         route?.startsWith("retrieve") == true -> AppDestination.RETRIEVE
         route?.startsWith("settings") == true -> AppDestination.SETTINGS
+        route?.startsWith("help") == true -> AppDestination.HELP
         else -> AppDestination.CAPTURE
     }
 
