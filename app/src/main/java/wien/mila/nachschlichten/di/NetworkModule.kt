@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import wien.mila.nachschlichten.BuildConfig
 import wien.mila.nachschlichten.data.remote.NachschlichtenApi
 import javax.inject.Named
 import javax.inject.Singleton
@@ -26,9 +27,20 @@ object NetworkModule {
     @Singleton
     @Named("plain")
     fun providePlainOkHttpClient(): OkHttpClient {
+        val userAgentInterceptor = Interceptor { chain ->
+            chain.proceed(
+                chain.request().newBuilder()
+                    .header(
+                        "User-Agent",
+                        "${BuildConfig.APP_NAME}/${BuildConfig.VERSION_NAME} (${BuildConfig.CONTACT_EMAIL})"
+                    )
+                    .build()
+            )
+        }
         return OkHttpClient.Builder()
             .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
             .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+            .addInterceptor(userAgentInterceptor)
             .build()
     }
 
