@@ -40,7 +40,7 @@ class ArticleRepository @Inject constructor(
             articleDao.getByEan(ean.substring(1))
         }
 
-        if (entity == null) return null;
+        if (entity == null) return null
 
         val eans = articleDao.getEansForArticle(entity.id)
         return entity.toModel(eans)
