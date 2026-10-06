@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "articles")
 data class ArticleEntity(
     @PrimaryKey val id: Long,
-    val ean: String,
     val name: String,
     val unit: String,
     val totalStock: Double,

@@ -27,32 +27,41 @@ data class ZonePendingCount(
 @Dao
 interface PendingItemDao {
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         WHERE p.shelfId = :shelfId AND p.isDone = 0
+        GROUP BY p.id
         ORDER BY p.createdAt DESC
     """)
     fun getByShelf(shelfId: String): Flow<List<PendingItemWithArticle>>
 
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         WHERE p.isDone = 0
+        GROUP BY p.id
         ORDER BY p.createdAt DESC
     """)
     fun getAllPending(): Flow<List<PendingItemWithArticle>>
 
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         INNER JOIN shelves s ON s.id = p.shelfId
         WHERE s.storageZoneId = :zoneId
+        GROUP BY p.id
         ORDER BY p.isDone ASC, p.createdAt DESC
     """)
     fun getByZone(zoneId: String): Flow<List<PendingItemWithArticle>>
@@ -66,12 +75,15 @@ interface PendingItemDao {
     fun getPendingCountByZone(): Flow<List<ZonePendingCount>>
 
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         INNER JOIN shelves s ON s.id = p.shelfId
         WHERE s.storageZoneId IS NULL
+        GROUP BY p.id
         ORDER BY p.isDone ASC, p.createdAt DESC
     """)
     fun getByNullZone(): Flow<List<PendingItemWithArticle>>
@@ -101,20 +113,26 @@ interface PendingItemDao {
     suspend fun deleteAllPending()
 
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         WHERE p.id = :id
+        GROUP BY p.id
     """)
     suspend fun getById(id: Long): PendingItemWithArticle?
 
     @Query("""
-        SELECT p.id, p.articleId, a.name AS articleName, a.ean AS articleEan,
+        SELECT p.id, p.articleId, a.name AS articleName,
+               COALESCE(GROUP_CONCAT(e.ean, ','), '') AS articleEan,
                p.shelfId, p.quantity, p.createdAt, p.isDone, a.imagePath
         FROM pending_items p
         INNER JOIN articles a ON a.id = p.articleId
+        LEFT JOIN article_eans e ON e.articleId = a.id
         WHERE p.articleId = :articleId AND p.shelfId = :shelfId AND p.isDone = 0
+        GROUP BY p.id
         LIMIT 1
     """)
     suspend fun getByArticleAndShelf(articleId: Long, shelfId: String): PendingItemWithArticle?

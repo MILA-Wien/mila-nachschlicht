@@ -25,7 +25,11 @@ object DatabaseModule {
             context,
             NachschlichtenDatabase::class.java,
             "nachschlichten.db"
-        ).addMigrations(NachschlichtenDatabase.MIGRATION_3_4, NachschlichtenDatabase.MIGRATION_4_5).build()
+        ).addMigrations(
+            NachschlichtenDatabase.MIGRATION_3_4,
+            NachschlichtenDatabase.MIGRATION_4_5,
+            NachschlichtenDatabase.MIGRATION_5_6
+        ).build()
     }
 
     @Provides

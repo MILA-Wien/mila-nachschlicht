@@ -41,7 +41,7 @@ class RetrieveItemCheckViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val pendingItem = pendingItemRepository.getById(pendingItemId)
-            val article = pendingItem?.let { articleRepository.getByEan(it.articleEan) }
+            val article = pendingItem?.let { articleRepository.getById(it.articleId) }
             val zone = storageZoneRepository.getById(zoneId)
             _uiState.value = RetrieveItemCheckUiState(
                 article = article,
@@ -64,7 +64,7 @@ class RetrieveItemCheckViewModel @Inject constructor(
         val article = _uiState.value.article ?: return
         if (article.imagePath != null) return
         viewModelScope.launch {
-            val url = articleRepository.fetchAndSaveImageFromOpenFoodFacts(article.ean, article.id)
+            val url = articleRepository.fetchAndSaveImageFromOpenFoodFacts(article.eans, article.id)
             if (url != null) {
                 _uiState.value = _uiState.value.copy(article = article.copy(imagePath = url))
             }

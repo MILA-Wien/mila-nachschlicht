@@ -246,12 +246,12 @@ fun CaptureScreen(
                             ) {
                                 PendingItemInfoCard(
                                     articleName = item.articleName,
-                                    subtitle = item.articleEan,
+                                    subtitle = item.articleEans.joinToString(", "),
                                     imagePath = item.imagePath,
                                     quantity = item.quantity,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { onNavigateToArticleCheck(item.articleEan, viewModel.shelfId) }
+                                        .clickable { onNavigateToArticleCheck(item.articleEans.firstOrNull() ?: "", viewModel.shelfId) }
                                 )
                             }
                         }

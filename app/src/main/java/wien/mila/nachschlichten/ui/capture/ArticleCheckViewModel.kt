@@ -102,7 +102,7 @@ class ArticleCheckViewModel @Inject constructor(
         val article = _uiState.value.article ?: return
         if (article.imagePath != null) return
         viewModelScope.launch {
-            val url = articleRepository.fetchAndSaveImageFromOpenFoodFacts(article.ean, article.id)
+            val url = articleRepository.fetchAndSaveImageFromOpenFoodFacts(article.eans, article.id)
             if (url != null) {
                 _uiState.value = _uiState.value.copy(article = article.copy(imagePath = url))
             }

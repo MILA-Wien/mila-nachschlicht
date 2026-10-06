@@ -118,7 +118,7 @@ fun ArticleInfoCard(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            "EAN: ${article.ean}",
+                            "EAN: ${article.eans.joinToString(", ")}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
