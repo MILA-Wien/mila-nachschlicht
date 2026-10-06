@@ -49,6 +49,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import wien.mila.nachschlichten.R
 import wien.mila.nachschlichten.ui.common.ArticleInfoCard
+import wien.mila.nachschlichten.ui.common.StockBar
 import java.io.File
 import java.util.UUID
 
@@ -146,13 +147,17 @@ fun RetrieveItemCheckScreen(
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    uiState.article?.let {
+                    val article = uiState.article
+                    if (article != null) {
                         ArticleInfoCard(
-                            article = it,
+                            article = article,
                             onImageNeeded = viewModel::fetchImageIfNeeded,
                             onCameraCapture = ::launchCamera
                         )
-                    } ?: Text(pendingItem.articleName, style = MaterialTheme.typography.headlineSmall)
+                        StockBar(totalStock = article.totalStock, unit = article.unit)
+                    } else {
+                        Text(pendingItem.articleName, style = MaterialTheme.typography.headlineSmall)
+                    }
 
                     Text(
                         text = "${stringResource(R.string.retrieve_for_shelf)}: ${pendingItem.shelfId}",
