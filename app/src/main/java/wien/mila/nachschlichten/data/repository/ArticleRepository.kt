@@ -29,7 +29,19 @@ class ArticleRepository @Inject constructor(
     fun countWithEan() = articleDao.countWithEan()
 
     suspend fun getByEan(ean: String): Article? {
-        val entity = articleDao.getByEan(ean) ?: return null
+        // First, try the EAN exactly as provided.
+        var entity = articleDao.getByEan(ean)
+        // If it's 12 digits, try prepending a zero.
+        if (entity == null && ean.length == 12) {
+            entity = articleDao.getByEan("0$ean")
+        }
+        // If it's 13 digits starting with zero, try dropping the leading zero.
+        if (entity == null && ean.length == 13 && ean.startsWith("0")) {
+            articleDao.getByEan(ean.substring(1))
+        }
+
+        if (entity == null) return null;
+
         val eans = articleDao.getEansForArticle(entity.id)
         return entity.toModel(eans)
     }
