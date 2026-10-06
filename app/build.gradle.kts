@@ -18,8 +18,8 @@ android {
         applicationId = "wien.mila.nachschlichten"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "APP_NAME", "\"MILA Nachschlichten\"")
